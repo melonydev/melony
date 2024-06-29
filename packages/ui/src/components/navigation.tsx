@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder } from "lucide-react";
+import * as icons from "lucide-react";
 import { cn } from "../lib";
 import React from "react";
 
@@ -42,17 +42,19 @@ export function NavigationItem({
 }: {
 	as: any;
 	title?: string;
-	icon?: any;
+	icon?: string;
 	href: string;
 }) {
 	const Comp = as || "div";
+	// @ts-ignore
+	const Icon = icons?.[icon || "Folder"];
 
 	const navContext = React.useContext(NavigationContext);
 
 	return (
 		<Comp
 			className={cn(
-				"px-2 h-8 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
+				"px-2 h-8 text-foreground/60 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
 				{
 					"text-accent-foreground bg-muted": navContext.activePathname === href,
 				},
@@ -62,7 +64,7 @@ export function NavigationItem({
 				navContext.setPathname(href);
 			}}
 		>
-			<Folder className="h-4 w-4 mr-2" />
+			{Icon && <Icon className="h-4 w-4 mr-2" />}
 			<span className="block truncate">{title}</span>
 		</Comp>
 	);

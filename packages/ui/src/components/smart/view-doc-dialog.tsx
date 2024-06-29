@@ -1,4 +1,4 @@
-import { Model } from "@melony/types";
+import { Model, Resource } from "@melony/types";
 
 import { Button } from "../ui/button";
 import {
@@ -15,27 +15,53 @@ import { X } from "lucide-react";
 import { SmartTabbedRelatedLists } from "./smart-tabbed-related-lists";
 import { Actions } from "./actions";
 import { DocMenu } from "./doc-menu";
-import { useApp } from "../providers/app-provider";
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+} from "../ui/sheet";
 
 export function ViewDocDialog({
 	data,
-	model,
+	resource,
 	open,
 	onClose,
 }: {
 	data: any;
-	model: Model;
+	resource: Resource;
 	open: boolean;
 	onClose: () => void;
 }) {
-	const { getModelActions } = useApp();
-
 	const { mutate: update, isPending: isUpdating } = useUpdate({
-		model,
+		resource,
 		onSuccess: () => {
 			onClose();
 		},
 	});
+
+	return (
+		<Sheet open={open} onOpenChange={(open) => !open && onClose()}>
+			<SheetContent className="sm:w-[500px] sm:max-w-[500px] xl:w-[740px] xl:max-w-[740px]">
+				<SheetHeader>
+					<SheetTitle>Update</SheetTitle>
+					<SheetDescription>
+						<div className="flex flex-col gap-4">
+							<SmartForm
+								resource={resource}
+								values={data}
+								onSubmit={update}
+								isSubmitting={isUpdating}
+							/>
+
+							<SmartTabbedRelatedLists resource={resource} doc={data || {}} />
+						</div>
+					</SheetDescription>
+				</SheetHeader>
+			</SheetContent>
+		</Sheet>
+	);
 
 	return (
 		<Dialog open={open} onOpenChange={(open) => !open && onClose()}>
@@ -45,12 +71,12 @@ export function ViewDocDialog({
 						<DialogTitle>Update</DialogTitle>
 						<div className="flex gap-1 items-center">
 							<Actions
-								model={model}
+								resource={resource}
 								docs={[data]}
-								actions={getModelActions(model.name)}
+								actions={resource?.actions || []}
 							/>
 
-							<DocMenu model={model} data={data} />
+							<DocMenu resource={resource} data={data} />
 
 							<DialogClose asChild>
 								<Button size="sm" variant="ghost">
@@ -64,13 +90,13 @@ export function ViewDocDialog({
 				<DialogBody>
 					<div className="flex flex-col gap-4">
 						<SmartForm
-							model={model}
+							resource={resource}
 							values={data}
 							onSubmit={update}
 							isSubmitting={isUpdating}
 						/>
 
-						<SmartTabbedRelatedLists model={model} doc={data || {}} />
+						<SmartTabbedRelatedLists resource={resource} doc={data || {}} />
 					</div>
 				</DialogBody>
 			</DialogContent>

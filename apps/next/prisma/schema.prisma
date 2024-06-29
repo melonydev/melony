@@ -3,86 +3,95 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Project {
-  id         String        @id @default(auto()) @map("_id") @db.ObjectId
-  title      String /// displayField
-  amount     Float?        @default(0)
-  customer   Customer      @relation(fields: [customerId], references: [id])
-  customerId String        @db.ObjectId
-  owner      User          @relation(fields: [ownerId], references: [id])
-  ownerId    String        @db.ObjectId
-  status     ProjectStatus @relation(fields: [statusId], references: [id])
-  statusId   String        @db.ObjectId
-  tasks      Task[]
-}
-
-model ProjectStatus {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  title    String /// displayField
-  color    String /// component=Color
-  projects Project[]
-}
-
-model Task {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
-  title       String /// displayField
-  item        Item       @relation(fields: [itemId], references: [id])
-  itemId      String     @db.ObjectId
-  project     Project    @relation(fields: [projectId], references: [id])
-  projectId   String     @db.ObjectId
-  status      TaskStatus @relation(fields: [statusId], references: [id])
-  statusId    String     @db.ObjectId
-  price       Float
-  description String?    @default("")
-  owner       User       @relation(fields: [ownerId], references: [id])
-  ownerId     String     @db.ObjectId
-}
-
-model TaskStatus {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String /// displayField
-  color String /// component=Color
-  tasks Task[]
-}
-
-/// some comment here
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  image    String? /// component=Image
-  email    String /// displayField
-  password String?
-  name     String?
-  projects Project[]
-  tasks    Task[]
-}
+  id        Int      @id @default(autoincrement())
+  firstName String   @default("")
+  lastName  String   @default("")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
 
-/// layout=Cards
-model File {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  downloadUrl String /// component=Image
-  name        String /// displayField
+  @@map("users")
 }
 
 model Customer {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  title    String /// displayField
-  projects Project[]
+  id        Int        @id @default(autoincrement())
+  firstName String     @default("")
+  lastName  String     @default("")
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @map("updated_at")
+  deviceId  String
+  devices   Device[]
+  locations Location[]
+  products  Product[]
+  scans     Scan[]
+
+  @@map("customers")
 }
 
-enum ItemType {
-  MATERIAL
-  PRODUCT
+model Device {
+  id         Int      @id @default(autoincrement())
+  deviceId   String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  @@map("devices")
 }
 
-model Item {
-  id    String   @id @default(auto()) @map("_id") @db.ObjectId
-  title String /// displayField
-  sku   String
-  price Float?   @default(0)
-  type  ItemType
-  tasks Task[]
+model Product {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+  manufacturer      String
+  productExternalId String
+  model             String
+  tickeType         String
+  madeIn            String
+  region            String
+  customerId        Int
+  customer          Customer @relation(fields: [customerId], references: [id])
+  scans             Scan[]
+
+  @@map("products")
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  lat        Float
+  long       Float
+  region     String
+  country    String
+  city       String
+  customerId Int
+  address    String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  scans      Scan[]
+
+  @@map("locations")
+}
+
+model Scan {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  authentic  Boolean
+  locationId Int
+  customerId Int
+  deviceId   String
+  productId  Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
+  products   Product  @relation(fields: [productId], references: [id])
+
+  @@map("scans")
 }

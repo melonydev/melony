@@ -1,7 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Action, CustomActionPayload, Model } from "@melony/types";
+import { Action, CustomActionPayload, Model, Resource } from "@melony/types";
 
-export function useAction({ model, action }: { model: Model; action: Action }) {
+export function useAction({
+	resource,
+	action,
+}: {
+	resource: Resource;
+	action: Action;
+}) {
 	const queryClient = useQueryClient();
 
 	return useMutation({
@@ -9,7 +15,7 @@ export function useAction({ model, action }: { model: Model; action: Action }) {
 		mutationFn: (props: CustomActionPayload) => action.handle(props),
 		onSuccess: () => {},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: [model.name] });
+			queryClient.invalidateQueries({ queryKey: [resource.path] });
 		},
 	});
 }

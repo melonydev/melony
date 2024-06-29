@@ -1,7 +1,17 @@
 {
 	"name": "melony",
-	"version": "0.0.2",
+	"version": "0.0.7",
 	"exports": {
+		"./config": {
+			"import": {
+				"types": "./dist/config.d.mts",
+				"default": "./dist/config.mjs"
+			},
+			"require": {
+				"types": "./dist/config.d.ts",
+				"default": "./dist/config.js"
+			}
+		},
 		"./core": {
 			"import": {
 				"types": "./dist/core.d.mts",
@@ -30,6 +40,16 @@
 			"require": {
 				"types": "./dist/prisma.d.ts",
 				"default": "./dist/prisma.js"
+			}
+		},
+		"./ui": {
+			"import": {
+				"types": "./dist/ui.d.mts",
+				"default": "./dist/ui.mjs"
+			},
+			"require": {
+				"types": "./dist/ui.d.ts",
+				"default": "./dist/ui.js"
 			}
 		}
 	},

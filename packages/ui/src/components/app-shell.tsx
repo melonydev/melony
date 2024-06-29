@@ -1,15 +1,12 @@
 import { Sidebar } from "./sidebar";
+import { Toaster } from "./ui/toaster";
 
 export function AppShell({
 	children,
-	title,
-	logo,
 	nav,
 	account,
 }: {
 	children: JSX.Element | React.ReactNode;
-	title: string;
-	logo?: any;
 	nav: JSX.Element | React.ReactNode;
 	account: JSX.Element | React.ReactNode;
 }) {
@@ -18,19 +15,15 @@ export function AppShell({
 
 	return (
 		<div className="relative overflow-hidden min-h-screen">
-			<Sidebar
-				logo={logo}
-				title={title}
-				nav={nav}
-				account={account}
-				isCollapsed={isCollapsed}
-			/>
-			<main
-				id="content"
-				className={`p-4 min-h-screen overflow-x-hidden transition-[margin] md:overflow-y-hidden ${isCollapsed ? "md:ml-14" : "md:ml-64"} h-full`}
+			<Sidebar nav={nav} account={account} isCollapsed={isCollapsed} />
+			<div
+				className={`flex flex-col min-h-screen overflow-x-hidden transition-[margin] md:overflow-y-hidden ${isCollapsed ? "md:ml-14" : "md:ml-60"} h-full`}
 			>
-				{children}
-			</main>
+				<main id="content" className="flex-1">
+					{children}
+				</main>
+				<Toaster />
+			</div>
 		</div>
 	);
 }

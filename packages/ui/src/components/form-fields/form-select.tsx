@@ -1,5 +1,5 @@
+import { SelectField } from "@melony/types";
 import { FormControl } from "../ui/form";
-import { Input } from "../ui/input";
 import {
 	Select,
 	SelectContent,
@@ -9,7 +9,10 @@ import {
 } from "../ui/select";
 import { FormFieldProps } from "./types";
 
-export function FormSelect({ field, formFieldProps }: FormFieldProps) {
+export function FormSelect({
+	field,
+	formFieldProps,
+}: FormFieldProps & { field: SelectField }) {
 	return (
 		<FormControl>
 			<Select onValueChange={formFieldProps.onChange}>

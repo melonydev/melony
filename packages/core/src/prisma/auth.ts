@@ -18,7 +18,7 @@ export async function loginAction(
 
 	try {
 		const user = await getAction({
-			model: { name: USERS_COLLECTION, fields: [] },
+			resource: { model: USERS_COLLECTION, fields: [] },
 			where: { email: payload.email },
 		});
 
@@ -57,7 +57,7 @@ export const getUserAction = async () => {
 
 	try {
 		const user = await getAction({
-			model: { name: USERS_COLLECTION, fields: [] },
+			resource: { model: USERS_COLLECTION, fields: [] },
 			where: { id: session.userId },
 		});
 

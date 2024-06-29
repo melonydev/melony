@@ -1,7 +1,16 @@
-import { FilterItem, Model } from "@melony/types";
+import { Field, FilterItem, Model, Resource } from "@melony/types";
 import { Prisma } from "@prisma/client";
 
-export const getModels = (): Model[] => {
+const getFieldType = (field: any): Field["type"] => {
+	if (field?.kind === "object") return "relationship";
+	if (field?.type === "Boolean") return "checkbox";
+	if (field?.type === "Int") return "number";
+	if (field?.type === "Float") return "number";
+
+	return "text";
+};
+
+export const generateModels = (): Model[] => {
 	const enums = Prisma.dmmf.datamodel.enums;
 
 	// console.log(Prisma.dmmf.datamodel.models.map((model) => console.log(model)));
@@ -14,24 +23,22 @@ export const getModels = (): Model[] => {
 			layout: modelOptions?.layout as any,
 			fields: model.fields.map((field) => {
 				const options = parseStringOptions(field?.documentation);
+				const fieldType = getFieldType(field);
 
 				return {
-					kind: field.kind,
 					name: field.name,
 					isRequired: field.isRequired,
 					isList: field.isList,
 					isUnique: field.isUnique,
 					isId: field.isId,
 					isReadOnly: field.isReadOnly,
-					type: field.type,
+					type: fieldType,
 					documentation: field?.documentation,
 					relationFromFields: field?.relationFromFields
 						? [...field?.relationFromFields]
 						: undefined,
-
-					// melony specific
+					relatedModel: fieldType === "relationship" ? field?.type : undefined,
 					isDisplayField: options?.displayField as boolean,
-					component: options?.component as Model["fields"][0]["component"],
 					options:
 						field.kind === "enum"
 							? enums
@@ -45,12 +52,6 @@ export const getModels = (): Model[] => {
 			}),
 		};
 	});
-};
-
-export const getModel = (modelName: string): Model | undefined => {
-	const prismaModel = getModels().find((x) => x.name === modelName);
-
-	return prismaModel;
 };
 
 type ParsedOptions = { [key: string]: string | boolean };
@@ -69,9 +70,7 @@ export function parseStringOptions(str?: string): ParsedOptions {
 	return options;
 }
 
-export function convertFilterToPrisma(
-	filters: FilterItem[],
-): Record<string, any> {
+export function buildWhere(filters: FilterItem[]): Record<string, any> {
 	const whereClause: Record<string, any> = {};
 	for (const filterItem of filters) {
 		const { field, operator, value } = filterItem;
@@ -91,3 +90,16 @@ export function convertFilterToPrisma(
 	}
 	return whereClause;
 }
+
+export const buildInclude = (resource?: Resource) => {
+	if (!resource) return undefined;
+
+	return (resource?.fields || [])
+		.filter((x) => x.type === "relationship")
+		.reduce<Record<string, any>>((prev, curr) => {
+			if (curr)
+				prev[curr.name.toLowerCase()] = curr?.isList ? { take: 3 } : true;
+
+			return prev;
+		}, {});
+};

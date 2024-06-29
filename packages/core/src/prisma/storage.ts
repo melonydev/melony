@@ -45,7 +45,7 @@ export const uploadAction = async ({ formData }: { formData: FormData }) => {
 				const downloadUrl = `https://${process.env.AMPLIFY_BUCKET}.${process.env.AWS_REGION}.cdn.digitaloceanspaces.com/${filePath}`;
 
 				const fileRes = await createAction({
-					model: { name: FILES_COLLECTION, fields: [] },
+					resource: { model: FILES_COLLECTION, fields: [] },
 					data: {
 						downloadUrl,
 						name: item.name,

@@ -2,30 +2,22 @@ import {
 	CreateActionPayload,
 	DeleteActionPayload,
 	ListActionPayload,
-	Model,
+	Resource,
 	UpdateActionPayload,
 } from "@melony/types";
 import { prisma } from "./prisma";
-import { convertFilterToPrisma } from "./helpers";
+import { buildInclude, buildWhere } from "./helpers";
 
-export const listAction = async ({ model, filter }: ListActionPayload) => {
+export const listAction = async ({ resource, filter }: ListActionPayload) => {
 	"use server";
 
-	const where = convertFilterToPrisma(filter || []);
-
-	const include = model.fields
-		.filter((x) => x.kind === "object")
-		.reduce<Record<string, any>>((prev, curr) => {
-			if (curr)
-				prev[curr.name.toLowerCase()] = curr.isList ? { take: 3 } : true;
-
-			return prev;
-		}, {});
+	const where = buildWhere(filter || []);
+	const include = buildInclude(resource);
 
 	// TODO: { select } needed for optimization to take only needed fields from related doc
 
 	// @ts-ignore
-	const res = await prisma[model.name].findMany({
+	const res = await prisma[resource.model].findMany({
 		where,
 		include,
 	}); // TODO: here modelName is camelCase so im not sure how it works when prisma.user model is always lowerCase.
@@ -33,19 +25,23 @@ export const listAction = async ({ model, filter }: ListActionPayload) => {
 };
 
 export const getAction = async ({
-	model,
+	resource,
 	where,
 }: {
-	model: Model;
+	resource: Resource;
 	where: any;
 }) => {
+	"use server";
+
+	const include = buildInclude(resource);
+
 	// @ts-ignore
-	const res = await prisma[model.name].findFirst({ where });
+	const res = await prisma[resource.model].findFirst({ where, include });
 	return res;
 };
 
 export const createAction = async ({
-	model,
+	resource,
 	data: inputData,
 }: CreateActionPayload) => {
 	"use server";
@@ -54,7 +50,7 @@ export const createAction = async ({
 	delete data.id;
 
 	// @ts-ignore
-	const res = await prisma[model.name].create({
+	const res = await prisma[resource.model].create({
 		data,
 	});
 
@@ -62,7 +58,7 @@ export const createAction = async ({
 };
 
 export const updateAction = async ({
-	model,
+	resource,
 	data: inputData,
 }: UpdateActionPayload) => {
 	"use server";
@@ -71,7 +67,7 @@ export const updateAction = async ({
 	delete data.id;
 
 	// @ts-ignore
-	const res = await prisma[model.name].update({
+	const res = await prisma[resource.model].update({
 		where: {
 			id: inputData?.id,
 		},
@@ -81,11 +77,14 @@ export const updateAction = async ({
 	return res;
 };
 
-export const deleteAction = async ({ model, where }: DeleteActionPayload) => {
+export const deleteAction = async ({
+	resource,
+	where,
+}: DeleteActionPayload) => {
 	"use server";
 
 	// @ts-ignore
-	const res = await prisma[model.name].delete({
+	const res = await prisma[resource.model].delete({
 		where,
 	});
 

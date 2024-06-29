@@ -1,4 +1,4 @@
-import { Action, Model } from "@melony/types";
+import { Action, Model, Resource } from "@melony/types";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -19,11 +19,11 @@ import React from "react";
 import { useAction } from "@/hooks/actions/use-action";
 
 export const Actions = ({
-	model,
+	resource,
 	actions,
 	docs,
 }: {
-	model: Model;
+	resource: Resource;
 	actions: Action[];
 	docs: any;
 }) => {
@@ -33,12 +33,12 @@ export const Actions = ({
 		<>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button variant="ghost">
+					<Button variant="outline">
 						<RocketIcon className="w-4 h-4 mr-2" />
 						Actions
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent className="w-56" align="end">
+				<DropdownMenuContent className="w-56" align="start">
 					{actions.map((action, i) => {
 						return (
 							<DropdownMenuItem
@@ -56,7 +56,7 @@ export const Actions = ({
 
 			{activeAction && (
 				<ActionDialog
-					model={model}
+					resource={resource}
 					title={activeAction?.name}
 					open={!!activeAction}
 					onClose={() => {
@@ -71,21 +71,21 @@ export const Actions = ({
 };
 
 export function ActionDialog({
-	model,
+	resource,
 	open,
 	onClose,
 	title = "Execute action",
 	action,
 	docs,
 }: {
-	model: Model;
+	resource: Resource;
 	open: boolean;
 	onClose: () => void;
 	title?: string;
 	action: Action;
 	docs: any;
 }) {
-	const { mutate, isPending } = useAction({ model, action });
+	const { mutate, isPending } = useAction({ resource, action });
 
 	const handleAction = () => {
 		mutate(

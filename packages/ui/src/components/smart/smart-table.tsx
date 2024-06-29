@@ -1,5 +1,5 @@
 import React from "react";
-import { Field, FilterItem, Model } from "@melony/types";
+import { Action, Field, FilterItem, Resource } from "@melony/types";
 
 import { DataTable } from "../data-table";
 import { Button } from "../ui/button";
@@ -8,28 +8,13 @@ import { useList } from "@/hooks";
 import { PlusIcon } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "../ui/checkbox";
-import { useApp } from "../providers/app-provider";
-import { makeTableFields } from "./helpers";
 import { AdvancedFilter } from "../advanced-filter";
-import { DisplayText } from "../display-fields/display-text";
-import { DisplayImage } from "../display-fields/display-image";
-import { DisplayDocument } from "../display-fields/display-document";
-import { DisplayDocuments } from "../display-fields/display-documents";
-import { DisplayColor } from "../display-fields/display-color";
 import { Actions } from "./actions";
 import { ViewDocDialog } from "./view-doc-dialog";
-import { DocMenu } from "./doc-menu";
 import { CreateDocDialog } from "./create-doc-dialog";
-
-const DISPLAY_FIELDS_MAP = {
-	String: DisplayText,
-
-	// Melony specific "component"
-	Document: DisplayDocument,
-	Documents: DisplayDocuments,
-	Image: DisplayImage,
-	Color: DisplayColor,
-};
+import { useApp } from "../providers/app-provider";
+import { DEFAULT_FIELD_UI_COMPONENTS } from "./default-field-ui-components";
+import { useQuery } from "@tanstack/react-query";
 
 const generateColumnsFromFields = (fields: Field[]) => {
 	const result: ColumnDef<
@@ -63,13 +48,16 @@ const generateColumnsFromFields = (fields: Field[]) => {
 		),
 		enableSorting: false,
 		enableHiding: false,
+		size: 48,
 	});
 
 	fields.map((field) => {
 		result.push({
 			accessorKey: field.name,
 			cell: ({ row }) => {
-				const Comp = DISPLAY_FIELDS_MAP[field?.component || "String"];
+				const Comp =
+					field?.components?.display ||
+					DEFAULT_FIELD_UI_COMPONENTS[field?.type || "text"].display;
 
 				return <Comp field={field} defaultValue={row.getValue(field.name)} />;
 			},
@@ -80,12 +68,20 @@ const generateColumnsFromFields = (fields: Field[]) => {
 };
 
 export function SmartTable({
-	model,
+	resource,
 	initialFilter,
+	queryAction,
+	headerActions = [],
+	fields,
 }: {
-	model: Model;
+	resource: Resource;
 	initialFilter?: FilterItem[];
+	queryAction: Action;
+	headerActions?: Action[];
+	fields: Field[];
 }) {
+	const { redirectAction } = useApp();
+
 	const [activeDoc, setActiveDoc] = React.useState<{
 		mode: "update" | "create";
 		data?: any;
@@ -95,57 +91,74 @@ export function SmartTable({
 
 	const [filter, setFilter] = React.useState<FilterItem[]>(initialFilter || []);
 
-	const { getModelActions } = useApp();
-
-	const { data = [], isLoading } = useList({
-		model,
+	const {
+		data = [],
+		isLoading,
+		error,
+	} = useList({
+		resource,
 		filter,
 	});
 
-	const modelActions = getModelActions(model.name);
+	const { data: dataFromAction } = useQuery({
+		queryKey: ["list-from-action"],
+		queryFn: () => queryAction.handler({}),
+	});
+
+	const actions = resource?.actions || [];
 
 	return (
 		<div id="table" className="h-full flex flex-col">
-			<div className="flex justify-between items-center py-4">
+			<div className="flex justify-between items-center py-2.5 border-b">
 				<div className="flex items-center gap-2">
 					<Input placeholder="Search..." />
 					<AdvancedFilter
-						model={model}
+						resource={resource}
 						values={filter}
 						onChange={(filter) => {
-							console.log("filterChange", filter);
 							setFilter(filter);
 						}}
 					/>
+					<Actions
+						resource={resource}
+						actions={actions}
+						docs={data.filter((_: any, index: number) =>
+							Object.keys(rowSelection).includes(`${index}`),
+						)}
+					/>
 				</div>
 				<div className="flex items-center gap-2">
-					{modelActions.length > 0 && (
-						<Actions
-							model={model}
-							actions={modelActions}
-							docs={data.filter((_: any, index: number) =>
-								Object.keys(rowSelection).includes(`${index}`),
-							)}
-						/>
-					)}
-
-					<Button
-						variant="outline"
+					{/* <Button
 						onClick={() => {
 							setActiveDoc({ mode: "create" });
 						}}
 					>
 						<PlusIcon className="w-4 h-4 mr-2" />
 						Create
-					</Button>
+					</Button> */}
+
+					{headerActions.map((headerAction) => {
+						return (
+							<Button
+								onClick={() => {
+									setActiveDoc({ mode: "create" });
+								}}
+							>
+								{headerAction?.name || headerAction.key}
+							</Button>
+						);
+					})}
 				</div>
 			</div>
+
 			<div className="flex-1">
 				<DataTable
-					columns={generateColumnsFromFields(makeTableFields(model.fields))}
+					columns={generateColumnsFromFields(fields || [])}
 					data={data}
 					isLoading={isLoading}
 					onClickRow={(data) => {
+						// redirectAction(`/${resource.model}/${data.id}`);
+
 						setActiveDoc({ mode: "update", data });
 					}}
 					onSelect={setRowSelection}
@@ -153,7 +166,7 @@ export function SmartTable({
 			</div>
 
 			<CreateDocDialog
-				model={model}
+				resource={resource}
 				open={activeDoc?.mode === "create"}
 				onClose={() => {
 					setActiveDoc(null);
@@ -161,7 +174,7 @@ export function SmartTable({
 			/>
 
 			<ViewDocDialog
-				model={model}
+				resource={resource}
 				data={activeDoc?.data}
 				open={activeDoc?.mode === "update"}
 				onClose={() => {

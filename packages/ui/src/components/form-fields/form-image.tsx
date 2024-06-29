@@ -57,7 +57,7 @@ export function FormImage({ field, formFieldProps }: FormFieldProps) {
 							inputRef.current && inputRef.current.click();
 						}}
 					>
-						Upload
+						{isPending ? "Uploading..." : "Upload"}
 					</Button>
 				</div>
 			</FormControl>

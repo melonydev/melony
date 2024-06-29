@@ -1,3 +1,3 @@
-import { makePage } from "melony/next";
-
-export default makePage();
+export default function Page() {
+	return <></>;
+}

@@ -47,16 +47,18 @@ export function Combobox({
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="min-w-[200px] max-w-[400px] justify-between"
 				>
-					{selectedOption?.icon && selectedOption.icon}
-					<span className="block truncate">
-						{isLoading
-							? "Loading..."
-							: value
-								? selectedOption?.label || value
-								: "Select"}
-					</span>
+					<div className="flex items-center max-w-full">
+						{selectedOption?.icon && selectedOption.icon}
+						<span className="block truncate">
+							{isLoading
+								? "Loading..."
+								: value
+									? selectedOption?.label || value
+									: "Select"}
+						</span>
+					</div>
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
@@ -66,25 +68,27 @@ export function Combobox({
 					<CommandList>
 						<CommandEmpty>No option found.</CommandEmpty>
 						<CommandGroup>
-							{options.map((option) => (
-								<CommandItem
-									key={option.value}
-									value={option.value}
-									onSelect={(currentValue) => {
-										onChange(currentValue === value ? "" : currentValue);
-										setOpen(false);
-									}}
-								>
-									<Check
-										className={cn(
-											"mr-2 h-4 w-4",
-											value === option.value ? "opacity-100" : "opacity-0",
-										)}
-									/>
-									{option?.icon && option.icon}
-									{option.label}
-								</CommandItem>
-							))}
+							{options.map((option) => {
+								return (
+									<CommandItem
+										key={option.value}
+										value={option.value}
+										onSelect={(currentValue) => {
+											onChange(currentValue === value ? "" : currentValue);
+											setOpen(false);
+										}}
+									>
+										<Check
+											className={cn(
+												"mr-2 h-4 w-4",
+												value === option.value ? "opacity-100" : "opacity-0",
+											)}
+										/>
+										{option?.icon && option.icon}
+										{option.label}
+									</CommandItem>
+								);
+							})}
 						</CommandGroup>
 					</CommandList>
 				</Command>

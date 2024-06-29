@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useApp } from "../..";
-import { Model } from "@melony/types";
+import { Resource } from "@melony/types";
 
 export function useUpdate({
-	model,
+	resource,
 	onSuccess,
 }: {
-	model: Model;
+	resource: Resource;
 	onSuccess: () => void;
 }) {
 	const queryClient = useQueryClient();
@@ -15,12 +15,12 @@ export function useUpdate({
 
 	return useMutation({
 		mutationKey: ["update"],
-		mutationFn: (data: any) => updateAction({ model, data }),
+		mutationFn: (data: any) => updateAction({ resource, data }),
 		onSuccess: () => {
 			onSuccess();
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: [model.name] });
+			queryClient.invalidateQueries({ queryKey: [resource.model] });
 		},
 	});
 }

@@ -1,65 +1,68 @@
 "use client";
 
 import {
-	Action,
+	Config,
 	CreateActionPayload,
 	DeleteActionPayload,
+	GetActionPayload,
 	ListActionPayload,
 	LoginActionPayload,
 	Model,
+	Resource,
 	UpdateActionPayload,
 } from "@melony/types";
 import { createContext, useContext } from "react";
 
 type DefaultActions = {
-	listAction: ({ model }: ListActionPayload) => Promise<any>;
-	createAction: ({ model, data }: CreateActionPayload) => Promise<any>;
-	updateAction: ({ model, data }: UpdateActionPayload) => Promise<any>;
-	deleteAction: ({ model, where }: DeleteActionPayload) => Promise<any>;
-
+	listAction: ({ resource }: ListActionPayload) => Promise<any>;
+	getAction: ({ resource, where }: GetActionPayload) => Promise<any>;
+	createAction: ({ resource, data }: CreateActionPayload) => Promise<any>;
+	updateAction: ({ resource, data }: UpdateActionPayload) => Promise<any>;
+	deleteAction: ({ resource, where }: DeleteActionPayload) => Promise<any>;
 	loginAction: (payload: LoginActionPayload) => Promise<any>;
 	logoutAction: () => Promise<any>;
 	getUserAction: () => Promise<any>;
-
 	uploadAction: ({ formData }: { formData: FormData }) => Promise<any>;
+	redirectAction: (path: string) => Promise<any>;
 };
 
 type AppProviderProps = {
+	config?: Config;
 	children: React.ReactNode;
-	actions?: Record<string, Action[]>;
-	models?: Model[];
+	resources: Resource[];
+	models: Model[];
 } & DefaultActions;
 
 const AppContext = createContext<
 	{
-		models?: Model[];
-		actions?: Record<string, Action[]>;
-		getModelActions: (modelName: string) => Action[];
+		config: Config;
+		resources: Resource[];
+		models: Model[];
 	} & DefaultActions
 >({
-	getModelActions: () => [],
+	config: {},
+	resources: [],
+	models: [],
 	listAction: () => Promise.resolve(),
+	getAction: () => Promise.resolve(),
 	createAction: () => Promise.resolve(),
 	updateAction: () => Promise.resolve(),
 	deleteAction: () => Promise.resolve(),
-
 	loginAction: () => Promise.resolve(),
 	logoutAction: () => Promise.resolve(),
 	getUserAction: () => Promise.resolve(),
 	uploadAction: () => Promise.resolve(),
+	redirectAction: () => Promise.resolve(),
 });
 
 export function AppProvider({
 	children,
-	actions,
+	resources,
 	models,
+	config = {},
 	...rest
 }: AppProviderProps) {
-	const getModelActions = (modelName: string) => {
-		return actions?.[modelName] || [];
-	};
-
-	const value = { getModelActions, actions, models, ...rest };
+	const value = { models, resources, config, ...rest };
 
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

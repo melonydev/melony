@@ -1,7 +1,6 @@
 import React from "react";
-import { Field, FilterItem, Model } from "@melony/types";
+import { FilterItem, Resource } from "@melony/types";
 
-import { DataTable } from "../data-table";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -22,40 +21,28 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ConfirmDialog } from "../confirm-dialog";
-import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "../ui/checkbox";
-import { useApp } from "../providers/app-provider";
-import { makeTableFields } from "./helpers";
 import { AdvancedFilter } from "../advanced-filter";
 import { DisplayText } from "../display-fields/display-text";
 import { DisplayImage } from "../display-fields/display-image";
-import { DisplayDocument } from "../display-fields/display-document";
+import { DisplayRelationship } from "../display-fields/display-relationship";
 import { SmartTabbedRelatedLists } from "./smart-tabbed-related-lists";
-import { DisplayDocuments } from "../display-fields/display-documents";
 import { DisplayColor } from "../display-fields/display-color";
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "../ui/card";
+import { Card } from "../ui/card";
 
 const DISPLAY_FIELDS_MAP = {
 	String: DisplayText,
 
 	// Melony specific "component"
-	Document: DisplayDocument,
-	Documents: DisplayDocuments,
+	Document: DisplayRelationship,
 	Image: DisplayImage,
 	Color: DisplayColor,
 };
 
 export function SmartCards({
-	model,
+	resource,
 	initialFilter,
 }: {
-	model: Model;
+	resource: Resource;
 	initialFilter?: FilterItem[];
 }) {
 	const [activeDoc, setActiveDoc] = React.useState<{
@@ -65,37 +52,28 @@ export function SmartCards({
 
 	const [filter, setFilter] = React.useState<FilterItem[]>(initialFilter || []);
 
-	const { getModelActions } = useApp();
-
 	const { data = [], isLoading } = useList({
-		model,
+		resource,
 		filter,
 	});
 
 	const { mutate: create, isPending: isCreating } = useCreate({
-		model,
-		onSuccess: () => {
-			setActiveDoc(null);
-		},
+		resource,
 	});
 
 	const { mutate: update, isPending: isUpdating } = useUpdate({
-		model,
+		resource,
 		onSuccess: () => {
 			setActiveDoc(null);
 		},
 	});
 
 	const { mutate: remove, isPending: isRemoving } = useDelete({
-		model,
+		resource,
 		onSuccess: () => {
 			setActiveDoc(null);
 		},
 	});
-
-	const modelActions = getModelActions(model.name);
-
-	console.log(modelActions);
 
 	return (
 		<div id="table" className="h-full flex flex-col">
@@ -103,7 +81,7 @@ export function SmartCards({
 				<div className="flex items-center gap-2">
 					<Input placeholder="Search..." />
 					<AdvancedFilter
-						model={model}
+						resource={resource}
 						values={filter}
 						onChange={(filter) => {
 							console.log("filterChange", filter);
@@ -126,8 +104,6 @@ export function SmartCards({
 			<div className="flex-1">
 				<div className="grid sm:grid-cols-4 2xl:grid-cols-6 gap-2">
 					{data.map((item: any) => {
-						const displayField = model.fields.find((f) => f.isDisplayField);
-
 						return (
 							<Card
 								key={data.id}
@@ -137,13 +113,10 @@ export function SmartCards({
 								}}
 							>
 								<div className="flex flex-col gap-4">
-									<div className="p-2 font-semibold">
-										{item?.[displayField?.name || "id"]}
-									</div>
+									<div className="p-2 font-semibold">{item?.["id"]}</div>
 
-									{model.fields.map((field) => {
-										const Comp =
-											DISPLAY_FIELDS_MAP[field?.component || "String"];
+									{(resource?.fields || []).map((field) => {
+										const Comp = DISPLAY_FIELDS_MAP["String"];
 
 										return (
 											<div key={field.name} className="p-2">
@@ -178,8 +151,14 @@ export function SmartCards({
 
 					<DialogBody>
 						<SmartForm
-							model={model}
-							onSubmit={create}
+							resource={resource}
+							onSubmit={(data) => {
+								create(data, {
+									onSuccess: () => {
+										setActiveDoc(null);
+									},
+								});
+							}}
 							isSubmitting={isCreating}
 						/>
 					</DialogBody>
@@ -227,14 +206,14 @@ export function SmartCards({
 					<DialogBody>
 						<div className="flex flex-col gap-4">
 							<SmartForm
-								model={model}
+								resource={resource}
 								values={activeDoc?.data}
 								onSubmit={update}
 								isSubmitting={isUpdating}
 							/>
 
 							<SmartTabbedRelatedLists
-								model={model}
+								resource={resource}
 								doc={activeDoc?.data || {}}
 							/>
 						</div>

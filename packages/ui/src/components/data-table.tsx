@@ -17,6 +17,13 @@ import {
 } from "./ui/table";
 import { Skeleton } from "./ui/skeleton";
 import React from "react";
+import { cn } from "..";
+
+const defaultColumnSizing = {
+	size: 180,
+	minSize: 20,
+	maxSize: Number.MAX_SAFE_INTEGER,
+};
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
@@ -46,6 +53,7 @@ export function DataTable<TData, TValue>({
 		state: {
 			rowSelection,
 		},
+		defaultColumn: defaultColumnSizing,
 	});
 
 	const renderBody = () => {
@@ -70,7 +78,7 @@ export function DataTable<TData, TValue>({
 					}}
 					className="cursor-pointer"
 				>
-					{row.getVisibleCells().map((cell) => (
+					{row.getVisibleCells().map((cell, i) => (
 						<TableCell key={cell.id}>
 							{flexRender(cell.column.columnDef.cell, cell.getContext())}
 						</TableCell>
@@ -91,9 +99,18 @@ export function DataTable<TData, TValue>({
 			<TableHeader>
 				{table.getHeaderGroups().map((headerGroup) => (
 					<TableRow key={headerGroup.id} className="hover:bg-[transparent]">
-						{headerGroup.headers.map((header) => {
+						{headerGroup.headers.map((header, i) => {
 							return (
-								<TableHead key={header.id} className="truncate">
+								<TableHead
+									key={header.id}
+									className={cn("truncate")}
+									style={{
+										width:
+											i === 1 && header.getSize() === defaultColumnSizing.size
+												? "auto"
+												: header.getSize(),
+									}} // considering that first column is always checkbox and second is always wider because we expect this is a main title if its not equal to default
+								>
 									{header.isPlaceholder
 										? null
 										: flexRender(

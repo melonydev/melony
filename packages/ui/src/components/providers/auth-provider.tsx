@@ -38,7 +38,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		return (
 			<div className="flex flex-col gap-4 items-center justify-center h-screen w-full">
 				<LoadingSpinner />
-				<div className="text-sm">Launching...</div>
+				<div className="text-sm">Loading...</div>
 			</div>
 		);
 

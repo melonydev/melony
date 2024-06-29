@@ -1,43 +1,71 @@
+import z from "zod";
 import { useForm, useFormContext } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-import { Field, Model } from "@melony/types";
+import { Field, Resource } from "@melony/types";
 import { getFieldValidation } from "@/lib/validation";
-import z from "zod";
 import { Button } from "../ui/button";
 import { Check } from "lucide-react";
-import { makeFormFields, removeRelationsFromFormValues } from "./helpers";
-import { FormInput } from "../form/form-input";
-import { FormCombobox } from "../form/form-combobox";
-import { FormImage } from "../form/form-image";
-import { FormColor } from "../form/form-color";
-import { FormSelect } from "../form/form-select";
-import { FormNumber } from "../form/form-number";
+import { DEFAULT_FIELD_UI_COMPONENTS } from "./default-field-ui-components";
+import { useApp } from "../providers/app-provider";
 
-const FORM_FIELDS_MAP = {
-	String: FormInput,
-	Number: FormNumber,
-	Select: FormSelect,
+const sanitizeFormFields = (fields: Field[]) => {
+	const newFields: Field[] = [];
 
-	// Melony specific "component"
-	Document: FormCombobox,
-	Documents: FormCombobox, // its not used here yet. we have separated tables for related many docs. here its just for to avoid TS errors.
-	Image: FormImage,
-	Color: FormColor,
+	fields.map((field) => {
+		const fieldName =
+			field.type === "relationship"
+				? field.relationFromFields?.[0] || "unknownField"
+				: field.name;
+
+		// replace relationship field names with scalar ones
+		newFields.push({ ...field, name: fieldName });
+	});
+
+	// omit one to many relations from the form
+	return newFields.filter((f) => !f.isList);
+};
+
+const normalizeFormFields = (values: any, fields: Field[]) => {
+	const newValues: any = {};
+
+	Object.keys(values).map((fieldName) => {
+		const field = fields.find((x) => x.name === fieldName);
+		let value = values?.[fieldName];
+
+		if (field?.type === "number") {
+			value = Number(value);
+		}
+
+		newValues[fieldName] = value;
+	});
+
+	return newValues;
 };
 
 export function SmartForm({
-	model,
+	resource,
 	values,
 	onSubmit,
+	onCancel,
 	isSubmitting,
 }: {
-	model: Model;
+	resource: Resource;
 	onSubmit: (data: any) => void;
+	onCancel?: () => void;
 	values?: any;
 	isSubmitting?: boolean;
 }) {
-	const schemaFields = model.fields.map((field) => {
+	const { models } = useApp();
+
+	// retrieve only fields provided in resource
+	const resourceFields = sanitizeFormFields(resource.fields);
+
+	const correspondingModel = models.find((m) => m.name === resource.model);
+	// retrieve all the fields
+	const modelFields = correspondingModel?.fields || [];
+
+	const schemaFields = resourceFields.map((field) => {
 		return [field.name, getFieldValidation(field)];
 	});
 
@@ -45,11 +73,14 @@ export function SmartForm({
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
-		values: removeRelationsFromFormValues({ values, model }),
+		values,
 	});
 
 	const handleSubmit = (inputData: any) => {
-		onSubmit(inputData);
+		// include ID to perform crud operation
+		onSubmit(
+			normalizeFormFields({ ...inputData, id: values?.id }, modelFields),
+		);
 	};
 
 	return (
@@ -58,10 +89,14 @@ export function SmartForm({
 				onSubmit={form.handleSubmit(handleSubmit, (err) => console.log(err))}
 				className="space-y-4"
 			>
-				<FormFields fields={makeFormFields(model)} />
+				<FormFields fields={resourceFields} />
 
 				<div className="flex gap-2 justify-end">
-					<Button variant="ghost">Cancel</Button>
+					{onCancel && (
+						<Button variant="ghost" onClick={onCancel}>
+							Cancel
+						</Button>
+					)}
 
 					<Button type="submit" disabled={isSubmitting}>
 						<Check className="h-4 w-4 mr-2" />
@@ -77,21 +112,11 @@ export function FormFields({ fields }: { fields: Field[] }) {
 	const { control } = useFormContext();
 
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col gap-4">
 			{fields.map((field) => {
-				let Comp = FORM_FIELDS_MAP["String"];
-
-				if (field.type === "Float") {
-					Comp = FORM_FIELDS_MAP["Number"];
-				}
-
-				if (field?.component) {
-					Comp = FORM_FIELDS_MAP[field.component];
-				}
-
-				if (field.kind === "enum") {
-					Comp = FORM_FIELDS_MAP["Select"];
-				}
+				let Comp =
+					field?.components?.form ||
+					DEFAULT_FIELD_UI_COMPONENTS[field?.type || "text"].form;
 
 				return (
 					<FormField
@@ -101,11 +126,11 @@ export function FormFields({ fields }: { fields: Field[] }) {
 						render={({ field: formFieldProps }) => {
 							return (
 								<FormItem>
-									<div className="grid grid-cols-12 gap-2">
-										<div className="col-span-3 py-2.5">
+									<div className="flex flex-col gap-1">
+										<div>
 											<FormLabel>{field.name}</FormLabel>
 										</div>
-										<div className="col-span-9 py-1.5">
+										<div>
 											<Comp formFieldProps={formFieldProps} field={field} />
 
 											<FormMessage />

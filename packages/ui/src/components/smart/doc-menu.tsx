@@ -1,4 +1,4 @@
-import { Model } from "@melony/types";
+import { Model, Resource } from "@melony/types";
 
 import { Button } from "../ui/button";
 import { Ellipsis } from "lucide-react";
@@ -12,11 +12,11 @@ import React from "react";
 import { ConfirmDialog } from "../confirm-dialog";
 import { useDelete } from "@/hooks";
 
-export function DocMenu({ data, model }: { data: any; model: Model }) {
+export function DocMenu({ data, resource }: { data: any; resource: Resource }) {
 	const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
 	const { mutate: remove, isPending: isRemoving } = useDelete({
-		model,
+		resource,
 		onSuccess: () => {
 			setShowDeleteDialog(false);
 		},

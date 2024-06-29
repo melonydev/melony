@@ -1,19 +1,20 @@
-import { Model } from "@melony/types";
+import { RelationshipField, Resource } from "@melony/types";
 
-import { getRelatedListFields } from "./helpers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useApp } from "../providers/app-provider";
 import { SmartTable } from "./smart-table";
 
 export function SmartTabbedRelatedLists({
-	model,
+	resource,
 	doc,
 }: {
-	model: Model;
+	resource: Resource;
 	doc: any;
 }) {
-	const { models = [] } = useApp();
-	const relatedListFields = getRelatedListFields({ model });
+	const { models = [], resources } = useApp();
+	const relatedListFields = resource.fields.filter(
+		(f) => f.isList,
+	) as RelationshipField[];
 
 	if (relatedListFields.length === 0) return <></>;
 
@@ -35,12 +36,24 @@ export function SmartTabbedRelatedLists({
 
 			{relatedListFields.map((relatedListField) => {
 				const relatedModel = models.find(
-					(x) => x.name === relatedListField.type,
+					(x) => x.name === relatedListField.relatedModel,
 				);
 
-				const relationFromFields = relatedModel?.fields.find(
-					(x) => x.type === model.name,
-				)?.relationFromFields;
+				const relatedResource = resources.find(
+					(x) => x.model === relatedListField.relatedModel,
+				);
+
+				if (!relatedResource) return <>Resource not found</>;
+				if (!relatedModel) return <>Model not found</>;
+
+				const relatedModelFields = (relatedModel?.fields ||
+					[]) as RelationshipField[];
+
+				const relationField = relatedModelFields.find(
+					(x) => x.relatedModel === resource.model,
+				) as RelationshipField;
+
+				const relationFromFields = relationField?.relationFromFields;
 
 				return (
 					<TabsContent
@@ -50,7 +63,7 @@ export function SmartTabbedRelatedLists({
 					>
 						{relatedModel && (
 							<SmartTable
-								model={relatedModel}
+								resource={relatedResource}
 								initialFilter={[
 									{
 										field: relationFromFields?.[0] || "unknown",
