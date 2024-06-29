@@ -17,24 +17,25 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { Field } from "@melony/types";
+import { getFieldValidation } from "@/lib/validation";
 
 type ActionBackedFormProps = {
 	fields: Field[];
 };
 
 export function ActionBackedForm({ fields }: ActionBackedFormProps) {
-	const FormSchema = z.object({
-		username: z.string().min(2, {
-			message: "Username must be at least 2 characters.",
-		}),
+	const schemaFields = fields.map((field) => {
+		return [field.name, getFieldValidation(field)];
 	});
 
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+	const formSchema = z.object(Object.fromEntries(schemaFields));
+
+	const form = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
 		defaultValues: {},
 	});
 
-	function onSubmit(data: z.infer<typeof FormSchema>) {
+	function onSubmit(data: z.infer<typeof formSchema>) {
 		toast({
 			title: "You submitted the following values:",
 			description: (
