@@ -10,15 +10,13 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useAuth } from "./providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
-import { useApp } from "./providers/app-provider";
 
 export function LoginForm() {
 	const { handleLogin } = useAuth();
-	const { loginAction } = useApp();
 
 	const { mutate: login, isPending } = useMutation({
 		mutationKey: ["login"],
-		mutationFn: loginAction,
+		mutationFn: Promise.resolve<{}>,
 		onSuccess: () => {
 			handleLogin();
 		},
@@ -88,21 +86,6 @@ export function LoginForm() {
 						</div>
 					</form>
 				</Form>
-
-				{/* <hr className="my-4" />
-
-				<Button
-					variant="outline"
-					className="w-full"
-					onClick={() =>
-						handleLogin({
-							provider: "google",
-						})
-					}
-					disabled={isLoading}
-				>
-					Login with Google
-				</Button> */}
 			</CardContent>
 		</Card>
 	);

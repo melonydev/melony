@@ -17,22 +17,16 @@ export const AuthContext = createContext<{
 }>({ user: null, handleLogin: () => {}, handleLogout: () => {} });
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { getUserAction } = useApp();
-
 	const { data, isLoading, refetch } = useQuery({
 		queryKey: ["getUser"],
-		queryFn: () => getUserAction(),
+		queryFn: () => null,
 	});
 
-	const handleLogin = () => {
-		refetch();
-	};
+	const handleLogin = () => {};
 
-	const handleLogout = () => {
-		refetch();
-	};
+	const handleLogout = () => {};
 
-	const value = { user: data, handleLogin, handleLogout };
+	const value = { user: data || null, handleLogin, handleLogout };
 
 	if (isLoading)
 		return (

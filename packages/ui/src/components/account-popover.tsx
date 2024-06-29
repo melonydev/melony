@@ -14,11 +14,10 @@ import { useApp } from "./providers/app-provider";
 
 export function AccountPopover() {
 	const { user, handleLogout } = useAuth();
-	const { logoutAction } = useApp();
 
 	const { mutate: logout } = useMutation({
 		mutationKey: ["logout"],
-		mutationFn: () => logoutAction(),
+		mutationFn: () => Promise.resolve({}),
 		onSuccess: () => {
 			handleLogout();
 		},

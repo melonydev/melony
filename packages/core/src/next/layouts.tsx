@@ -1,13 +1,5 @@
 import Link from "next/link";
 import {
-	listAction,
-	createAction,
-	updateAction,
-	deleteAction,
-	getAction,
-	generateModels,
-} from "@/prisma";
-import {
 	AccountPopover,
 	AuthProvider,
 	AppShell,
@@ -17,37 +9,17 @@ import {
 	Protected,
 	ProjectPopover,
 } from "@melony/ui";
-import { getUserAction, loginAction, logoutAction } from "@/prisma/auth";
 import { AppProvider } from "@melony/ui";
-import { uploadAction } from "@/prisma/storage";
-import { redirectAction } from "./actions";
-import { getPages, getPathname, mergeResourcesWithModels } from "./utils";
+import { getPages, getPathname } from "./utils";
 
 export async function MelonyApp({ children }: { children: React.ReactNode }) {
 	const pathname = getPathname();
-
-	const models = generateModels();
-	const resources = mergeResourcesWithModels([]);
 
 	const pages = await getPages();
 
 	return (
 		<QueryProvider>
-			<AppProvider
-				config={{}}
-				resources={resources}
-				models={models}
-				listAction={listAction}
-				getAction={getAction}
-				createAction={createAction}
-				updateAction={updateAction}
-				deleteAction={deleteAction}
-				loginAction={loginAction}
-				logoutAction={logoutAction}
-				getUserAction={getUserAction}
-				uploadAction={uploadAction}
-				redirectAction={redirectAction}
-			>
+			<AppProvider>
 				<AuthProvider>
 					<Protected>
 						<AppShell
@@ -74,22 +46,6 @@ export async function MelonyApp({ children }: { children: React.ReactNode }) {
 											</Navigation>
 										</div>
 									</div>
-
-									{/* <hr style={{ margin: "8px 0" }} />
-
-										<Navigation initialPathname={modelName}>
-											{resources.map((resource) => {
-												return (
-													<NavigationItem
-														key={resource.model}
-														as={Link}
-														icon=""
-														title={resource?.label || resource.model}
-														href={`/${resource.model}`}
-													/>
-												);
-											})}
-										</Navigation> */}
 								</div>
 							}
 							account={

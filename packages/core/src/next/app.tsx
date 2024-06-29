@@ -1,13 +1,5 @@
 import Link from "next/link";
 import {
-	listAction,
-	createAction,
-	updateAction,
-	deleteAction,
-	getAction,
-	generateModels,
-} from "@/prisma";
-import {
 	AccountPopover,
 	AuthProvider,
 	AppShell,
@@ -22,38 +14,18 @@ import {
 	// Button,
 } from "@melony/ui";
 import { Config } from "@melony/types";
-import { getUserAction, loginAction, logoutAction } from "@/prisma/auth";
 import { AppProvider } from "@melony/ui";
-import { uploadAction } from "@/prisma/storage";
-import { redirectAction } from "./actions";
-import { getPathname, mergeResourcesWithModels } from "./utils";
+import { getPathname } from "./utils";
 
 export function makeApp(config?: Config) {
 	return async function App({ children }: { children: React.ReactNode }) {
 		const pathname = getPathname();
 
-		const models = generateModels();
-		const resources = mergeResourcesWithModels([]);
-
 		const pages = config?.pages || [];
 
 		return (
 			<QueryProvider>
-				<AppProvider
-					config={config}
-					resources={resources}
-					models={models}
-					listAction={listAction}
-					getAction={getAction}
-					createAction={createAction}
-					updateAction={updateAction}
-					deleteAction={deleteAction}
-					loginAction={loginAction}
-					logoutAction={logoutAction}
-					getUserAction={getUserAction}
-					uploadAction={uploadAction}
-					redirectAction={redirectAction}
-				>
+				<AppProvider config={config}>
 					<AuthProvider>
 						<Protected>
 							<AppShell

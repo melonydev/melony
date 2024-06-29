@@ -1,10 +1,6 @@
 import React from "react";
-import { useApp } from "./providers/app-provider";
-import { Card, CardContent, CardHeader, CardTitle, cn } from "..";
 
 export function Page({ children }: { children: React.ReactNode }) {
-	const { config } = useApp();
-
 	return (
 		<div id="page" className="h-screen flex flex-col">
 			<PageHeader title={"page title"} />
