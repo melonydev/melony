@@ -1,11 +1,35 @@
-import { FormControl } from "../ui/form";
+import { useFormContext } from "react-hook-form";
+import {
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "../ui/form";
 import { Textarea } from "../ui/textarea";
-import { FormFieldProps } from "./types";
+import { RichTextField } from "@melony/types";
 
-export function FormRichText({ field, formFieldProps }: FormFieldProps) {
+export function FormRichText({ field }: { field: RichTextField }) {
+	const { control } = useFormContext();
+
 	return (
-		<FormControl>
-			<Textarea placeholder={field.name} {...formFieldProps} />
-		</FormControl>
+		<FormField
+			key={field.key}
+			control={control}
+			name={field.key}
+			render={({ field: rhfField }) => (
+				<FormItem>
+					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormControl>
+						<Textarea {...rhfField} />
+					</FormControl>
+					{field?.description && (
+						<FormDescription>{field?.description}</FormDescription>
+					)}
+					<FormMessage />
+				</FormItem>
+			)}
+		/>
 	);
 }

@@ -1,31 +1,45 @@
-// export type DBField = {
-// 	type: string;
-// 	kind: string;
-// 	name: string;
-// 	isRequired: boolean;
-// 	isList: boolean;
-// 	isUnique: boolean;
-// 	isId: boolean;
-// 	isReadOnly: boolean;
-// 	default?: unknown;
-// 	isDisplayField?: boolean;
-// 	relationFromFields?: string[];
-// 	relationModel?: string;
-// 	options?: { label: string; value: any }[];
-// 	component?: "Document" | "Image" | "Color";
-// 	documentation?: string | undefined;
-// };
+// main configs
+export type AppConfig = {
+	title: string;
+	ui?: UI;
+	auth?: Auth;
+	resources?: Resource[];
+};
 
-// models
-export type Model = {
-	name: string;
+export type Auth = {
+	actions: AuthAction[];
+};
+
+export type ID = string | number;
+
+export type SelectOption = {
+	label: string;
+	value: string;
+	image?: string;
+	color?: string;
+};
+
+// resources
+export type Resource = {
+	id: string;
+	title?: string;
+	description?: string;
 	fields?: Field[];
 	actions?: Action[];
 };
 
+// widgets
+export type BaseWidget = {
+	title?: string;
+	description?: string;
+	width?: "sm" | "md" | "lg";
+};
+
 // fields
 export type BaseField = {
-	name: string;
+	key: string;
+	label?: string;
+	description?: string;
 	isRequired?: boolean;
 	isList?: boolean;
 	isUnique?: boolean;
@@ -62,11 +76,12 @@ export type ColorField = BaseField & {
 
 export type RelationshipField = BaseField & {
 	type?: "relationship";
-	relationFromFields?: string[];
-	relatedModel?: string;
+	handler: ({ q }: { q: string }) => Promise<SelectOption[]>;
+	valueAsNumber?: boolean;
 	displayField?: string;
-	imageField?: string;
-	colorField?: string;
+	titleKey?: string;
+	colorKey?: string;
+	imageKey?: string;
 };
 
 export type SelectField = BaseField & {
@@ -82,6 +97,14 @@ export type ImageField = BaseField & {
 	type?: "image";
 };
 
+export type EmailField = BaseField & {
+	type?: "email";
+};
+
+export type PasswordField = BaseField & {
+	type?: "password";
+};
+
 export type Field =
 	| TextField
 	| NumberField
@@ -90,96 +113,123 @@ export type Field =
 	| ColorField
 	| SelectField
 	| RichTextField
-	| ImageField;
+	| ImageField
+	| EmailField
+	| PasswordField;
 
 // actions
-export type Action = {
-	key: string;
-	name?: string;
+export type BaseAction = {
+	id: "getList" | "getOne" | "deleteOne" | "create" | "update" | string;
+	title?: string;
+	description?: string;
 	icon?: string;
-	handler: (props: any) => Promise<any>;
+	fields?: Field[];
 };
 
-// resources
-export type Resource = {
-	label?: string;
-	model: string;
-	fields: Field[];
-	actions?: Action[];
+export type ActionResponse = any;
+
+export type GetListActionParams = {
+	q?: string;
+	filter?: FilterItem[];
+	sort?: any;
+	paginate?: any;
+};
+export type GetListAction = BaseAction & {
+	type: "getList";
+	handler: (params: GetListActionParams) => Promise<ActionResponse>;
 };
 
+export type GetOneActionParams = { id?: ID };
+export type GetOneAction = BaseAction & {
+	type: "getOne";
+	handler: (params: GetOneActionParams) => Promise<ActionResponse>;
+};
+
+export type DeleteOneActionParams = { id?: ID };
+export type DeleteOneAction = BaseAction & {
+	type: "deleteOne";
+	handler: (params: DeleteOneActionParams) => Promise<ActionResponse>;
+};
+
+export type CreateActionParams = { data?: any };
+export type CreateAction = BaseAction & {
+	type: "create";
+	handler: (params: CreateActionParams) => Promise<ActionResponse>;
+};
+
+export type UpdateActionParams = { id?: ID; data?: any };
+export type UpdateAction = BaseAction & {
+	type: "update";
+	handler: (params: UpdateActionParams) => Promise<ActionResponse>;
+};
+
+export type CustomActionParams = { id?: ID; data?: any };
+export type CustomAction = BaseAction & {
+	type: "custom";
+	handler: (params: CustomActionParams) => Promise<ActionResponse>;
+};
+
+export type Action =
+	| GetListAction
+	| GetOneAction
+	| DeleteOneAction
+	| CreateAction
+	| UpdateAction
+	| CustomAction;
+
+export type GetSuggestionsActionParams = { q: string };
+export type GetSuggestionsAction = ({ q }: GetListActionParams) => Promise<any>;
+
+export type SuggestionAction = GetSuggestionsAction;
+
+export type LoginActionParams = {};
+export type LoginAction = BaseAction & {
+	type: "login";
+	handler: (params: LoginActionParams) => Promise<ActionResponse>;
+};
+
+export type LogoutActionParams = {};
+export type LogoutAction = BaseAction & {
+	type: "logout";
+	handler: (params?: LogoutActionParams) => Promise<ActionResponse>;
+};
+
+export type GetUserActionParams = { data?: any };
+export type GetUserAction = BaseAction & {
+	type: "getUser";
+	handler: (params: GetUserActionParams) => Promise<ActionResponse>;
+};
+
+export type AuthAction = LoginAction | LogoutAction | GetUserAction;
+
+// UI
 export type UI = {
-	title: string;
 	logo?: any; // JSX.Element
 	colors?: {
 		primary: string;
 		border?: string;
 	};
 	radius?: number;
-};
-
-export type Plugin = (config: Config) => Config;
-
-export type Widget = {
-	title: string;
-	width?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-	actions?: Action[];
-	content?: any; // react JSX element
-};
-
-// by default, page is 12 columns width
-export type Page = {
-	title: string;
-	path: string; // page path is always 0 segment within url
-	icon?: string;
-	isHidden?: boolean;
-	widgets?: Widget[];
-};
-
-// main configs
-export type Config = {
-	ui?: UI;
-	pages?: Page[];
-	plugins?: Plugin[];
+	font?: {
+		className: string;
+		style: {
+			fontFamily: string;
+			fontWeight?: number;
+			fontStyle?: string;
+		};
+	};
 };
 
 // auth
 export type User = {
-	id: string;
-	email: string;
-	image?: string;
-	name?: string;
-};
-
-// in-built actions
-export type LoginActionPayload = {
-	email: string;
-	password: string;
-};
-
-export type ListActionPayload = {
-	resource: Resource;
-	filter?: FilterItem[];
-};
-
-export type GetActionPayload = {
-	resource: Resource;
-	where: any;
-};
-
-export type CreateActionPayload = {
-	resource: Resource;
-	data: any;
-};
-
-export type UpdateActionPayload = {
-	resource: Resource;
-	data: any;
-};
-
-export type DeleteActionPayload = {
-	resource: Resource;
-	where: any;
+	id: ID;
+	email: string | null;
+	picture?: string;
+	username?: string;
+	fullName?: string;
+	firstName?: string;
+	lastName?: string;
+	phoneNumber?: number;
 };
 
 // filters

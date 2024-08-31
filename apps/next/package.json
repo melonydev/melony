@@ -12,6 +12,8 @@
 		"seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
 	},
 	"dependencies": {
+		"@kinde-oss/kinde-auth-nextjs": "2.3.6",
+		"@melony/ui": "workspace:*",
 		"@prisma/client": "5.14.0",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.0",

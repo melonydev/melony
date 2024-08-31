@@ -18,12 +18,8 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-
-export type SelectOption = {
-	label: string;
-	value: string;
-	icon?: React.ReactNode;
-};
+import { SelectOption } from "@melony/types";
+import { SmartBadge } from "../smart-badge";
 
 export function Combobox({
 	options,
@@ -49,16 +45,16 @@ export function Combobox({
 					aria-expanded={open}
 					className="min-w-[200px] max-w-[400px] justify-between"
 				>
-					<div className="flex items-center max-w-full">
-						{selectedOption?.icon && selectedOption.icon}
-						<span className="block truncate">
-							{isLoading
-								? "Loading..."
-								: value
-									? selectedOption?.label || value
-									: "Select"}
-						</span>
-					</div>
+					{selectedOption ? (
+						<SmartBadge
+							title={selectedOption.label}
+							image={selectedOption.image}
+							color={selectedOption.color}
+						/>
+					) : (
+						<>- Select</>
+					)}
+
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
@@ -84,8 +80,12 @@ export function Combobox({
 												value === option.value ? "opacity-100" : "opacity-0",
 											)}
 										/>
-										{option?.icon && option.icon}
-										{option.label}
+
+										<SmartBadge
+											title={option.label}
+											image={option.image}
+											color={option.color}
+										/>
 									</CommandItem>
 								);
 							})}

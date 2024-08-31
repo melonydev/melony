@@ -12,28 +12,20 @@ import { useAuth } from "./providers/auth-provider";
 import { useMutation } from "@tanstack/react-query";
 
 export function LoginForm() {
-	const { handleLogin } = useAuth();
+	const { login } = useAuth();
 
-	const { mutate: login, isPending } = useMutation({
+	const { mutate: handleLogin, isPending } = useMutation({
 		mutationKey: ["login"],
-		mutationFn: Promise.resolve<{}>,
-		onSuccess: () => {
-			handleLogin();
-		},
+		mutationFn: login,
 	});
 
-	const formSchema = z.object({
-		email: z.string().min(3),
-		password: z.string().min(3),
-	});
-
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
+	const form = useForm({
+		// resolver: zodResolver(formSchema),
 		defaultValues: { email: "", password: "" },
 	});
 
-	const handleSubmit = (data: z.infer<typeof formSchema>) => {
-		login(data);
+	const handleSubmit = () => {
+		handleLogin({});
 	};
 
 	return (

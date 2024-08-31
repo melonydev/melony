@@ -1,10 +1,10 @@
 import { DisplayFieldProps } from "./types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
-export const DisplayImage = ({ field, defaultValue }: DisplayFieldProps) => {
+export const DisplayImage = ({ field, value }: DisplayFieldProps) => {
 	return (
 		<Avatar className="h-8 w-8">
-			<AvatarImage src={defaultValue} alt={field.name} />
+			<AvatarImage src={value} alt={field.key} />
 			<AvatarFallback></AvatarFallback>
 		</Avatar>
 	);

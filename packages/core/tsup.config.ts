@@ -6,8 +6,6 @@ export default defineConfig((options) => {
 			config: "src/config/index.ts",
 			auth: "src/auth/index.ts",
 			next: "src/next/index.ts",
-			prisma: "src/prisma/index.ts",
-			ui: "src/ui/index.ts",
 		},
 		tsconfig: "./tsconfig.json",
 		format: ["esm", "cjs"],

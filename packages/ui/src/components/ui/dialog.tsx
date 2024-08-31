@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
 import { cn } from "../../lib";
 
 const Dialog = DialogPrimitive.Root;
@@ -66,21 +65,13 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col space-y-1.5 text-center sm:text-left px-3.5 py-2 border-b border-border/60",
+			"flex flex-col space-y-1.5 text-center sm:text-left py-3.5 px-4 border-b",
 			className,
 		)}
 		{...props}
 	/>
 );
 DialogHeader.displayName = "DialogHeader";
-
-const DialogBody = ({
-	className,
-	...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-	<div className={cn("p-8", className)} {...props} />
-);
-DialogBody.displayName = "DialogBody";
 
 const DialogFooter = ({
 	className,
@@ -102,10 +93,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
 	<DialogPrimitive.Title
 		ref={ref}
-		className={cn(
-			"font-semibold leading-none tracking-tight",
-			className,
-		)}
+		className={cn("font-semibold leading-none tracking-tight", className)}
 		{...props}
 	/>
 ));
@@ -134,5 +122,4 @@ export {
 	DialogFooter,
 	DialogTitle,
 	DialogDescription,
-	DialogBody,
 };

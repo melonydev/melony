@@ -10,17 +10,13 @@ import {
 } from "./ui/dropdown-menu";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "./providers/auth-provider";
-import { useApp } from "./providers/app-provider";
 
 export function AccountPopover() {
-	const { user, handleLogout } = useAuth();
+	const { user, logout } = useAuth();
 
-	const { mutate: logout } = useMutation({
+	const { mutate: handleLogout } = useMutation({
 		mutationKey: ["logout"],
-		mutationFn: () => Promise.resolve({}),
-		onSuccess: () => {
-			handleLogout();
-		},
+		mutationFn: logout,
 	});
 
 	return (
@@ -28,25 +24,28 @@ export function AccountPopover() {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<div className="flex items-center cursor-pointer hover:bg-muted rounded-lg px-2 py-1">
-						<Avatar className="h-7 w-7 mr-2">
-							<AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+						<Avatar className="h-7 w-7">
+							<AvatarImage
+								src={user?.picture || ""}
+								alt={user?.fullName || ""}
+							/>
 							<AvatarFallback className="text-xs">
-								{(user?.name || "").slice(0, 2).toUpperCase()}
+								{(user?.fullName || "").slice(0, 2).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
 
 						<div className="text-left">
-							<div className="text-sm">{user?.name}</div>
+							<div className="text-sm">{user?.fullName}</div>
 							<div className="text-xs opacity-60">{user?.email}</div>
 						</div>
 					</div>
 				</DropdownMenuTrigger>
 
-				<DropdownMenuContent className="w-56">
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
+				<DropdownMenuContent className="w-56" align="start">
+					<DropdownMenuLabel>{user?.email || user?.id}</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem onClick={() => logout()}>
+						<DropdownMenuItem onClick={() => handleLogout({})}>
 							<span>Logout</span>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>

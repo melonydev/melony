@@ -8,21 +8,22 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "./providers/auth-provider";
-import { useApp } from "./providers/app-provider";
+import { stringToColor } from "@/lib/string-to-color";
 
 export function ProjectPopover({ title }: { title: string }) {
-	const { user } = useAuth();
-
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col flex-1 gap-1">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<div className="flex items-center cursor-pointer hover:bg-muted rounded-lg px-2 py-1">
-						<Avatar className="h-7 w-7 mr-2">
-							<AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-							<AvatarFallback className="text-xs">
+					<div className="flex items-center cursor-pointer hover:bg-muted rounded-md px-2 py-1">
+						<Avatar className="h-7 w-7 mr-2 rounded">
+							<AvatarImage />
+							<AvatarFallback
+								className="text-xs rounded"
+								// style={{
+								// 	backgroundColor: stringToColor(title),
+								// }}
+							>
 								{title.slice(0, 2).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
@@ -33,7 +34,7 @@ export function ProjectPopover({ title }: { title: string }) {
 					</div>
 				</DropdownMenuTrigger>
 
-				<DropdownMenuContent className="w-56">
+				<DropdownMenuContent className="w-56" align="start">
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>

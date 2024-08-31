@@ -1,5 +1,4 @@
-import { MelonyApp } from "melony/next";
+import { createLayout } from "melony/next";
+import { appConfig } from "../app-config";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-	return <MelonyApp>{children}</MelonyApp>;
-}
+export default createLayout(appConfig);

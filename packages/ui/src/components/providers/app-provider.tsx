@@ -1,23 +1,31 @@
-"use client";
+import { Toaster } from "../ui/toaster";
+import { QueryProvider } from "./query-provider";
 
-import { Config } from "@melony/types";
 import { createContext, useContext } from "react";
 
-type DefaultActions = {};
-
-type AppProviderProps = {
-	config?: Config;
-	children: React.ReactNode;
-} & DefaultActions;
-
-const AppContext = createContext<{} & DefaultActions>({
-	config: {},
+export const AppContext = createContext<{
+	navigate: (path: string) => void;
+}>({
+	navigate: () => {},
 });
 
-export function AppProvider({ children, ...rest }: AppProviderProps) {
-	const value = { ...rest };
+export function AppProvider({
+	children,
+	navigate,
+}: {
+	children: React.ReactNode;
+	navigate: (path: string) => void;
+}) {
+	const value = { navigate };
 
-	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+	return (
+		<AppContext.Provider value={value}>
+			<QueryProvider>
+				{children}
+				<Toaster />
+			</QueryProvider>
+		</AppContext.Provider>
+	);
 }
 
 export const useApp = () => {

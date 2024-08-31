@@ -1,5 +1,12 @@
 import { SelectField } from "@melony/types";
-import { FormControl } from "../ui/form";
+import {
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "../ui/form";
 import {
 	Select,
 	SelectContent,
@@ -7,26 +14,39 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
-import { FormFieldProps } from "./types";
+import { useFormContext } from "react-hook-form";
 
-export function FormSelect({
-	field,
-	formFieldProps,
-}: FormFieldProps & { field: SelectField }) {
+export function FormSelect({ field }: { field: SelectField }) {
+	const { control } = useFormContext();
+
 	return (
-		<FormControl>
-			<Select onValueChange={formFieldProps.onChange}>
-				<SelectTrigger className="w-[180px]">
-					<SelectValue placeholder="Select" />
-				</SelectTrigger>
-				<SelectContent>
-					{field?.options?.map((option) => (
-						<SelectItem key={option.value} value={option.value}>
-							{option.label}
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
-		</FormControl>
+		<FormField
+			key={field.key}
+			control={control}
+			name={field.key}
+			render={({ field: rhfField }) => (
+				<FormItem>
+					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormControl>
+						<Select value={rhfField.value} onValueChange={rhfField.onChange}>
+							<SelectTrigger className="w-[180px]">
+								<SelectValue placeholder="Select" />
+							</SelectTrigger>
+							<SelectContent>
+								{field.options?.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</FormControl>
+					{field?.description && (
+						<FormDescription>{field?.description}</FormDescription>
+					)}
+					<FormMessage />
+				</FormItem>
+			)}
+		/>
 	);
 }

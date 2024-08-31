@@ -60,7 +60,7 @@ export function DataTable<TData, TValue>({
 		if (isLoading)
 			return Array.from([1, 2, 3]).map((item) => (
 				<TableRow key={item}>
-					{columns.map((cell, i) => (
+					{columns.map((col, i) => (
 						<TableCell key={i}>
 							<Skeleton className="h-4 w-full" />
 						</TableCell>

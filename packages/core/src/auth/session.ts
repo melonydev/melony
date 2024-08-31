@@ -15,9 +15,9 @@ export async function encrypt(payload: { userId: string; expiresAt: Date }) {
 		.sign(encodedKey);
 }
 
-export async function decrypt(session: string | undefined = "") {
+export async function decrypt(sessionToken: string | undefined = "") {
 	try {
-		const { payload } = await jwtVerify(session, encodedKey, {
+		const { payload } = await jwtVerify(sessionToken, encodedKey, {
 			algorithms: ["HS256"],
 		});
 		return payload;
@@ -50,16 +50,16 @@ export async function createSession(userId: string) {
 }
 
 export async function updateSession() {
-	const session = cookies().get("session")?.value;
-	const payload = await decrypt(session);
+	const sessionToken = cookies().get("session")?.value;
+	const payload = await decrypt(sessionToken);
 
-	if (!session || !payload) {
+	if (!sessionToken || !payload) {
 		return null;
 	}
 
 	const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-	cookies().set("session", session, {
+	cookies().set("session", sessionToken, {
 		httpOnly: true,
 		secure: true,
 		expires: expires,
@@ -69,15 +69,15 @@ export async function updateSession() {
 }
 
 export const verifySession = async () => {
-	const cookie = cookies().get("session")?.value;
-	const session = await decrypt(cookie);
+	const sessionToken = cookies().get("session")?.value;
+	const session = await decrypt(sessionToken);
 
 	if (!session?.userId) {
 		// throw new Error("Not logged in");
 		return null;
 	}
 
-	await updateSession();
+	// await updateSession(sessionToken, session);
 
 	return { isAuth: true, userId: session.userId };
 };

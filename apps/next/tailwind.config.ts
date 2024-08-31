@@ -7,7 +7,7 @@ const config = {
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
 		"./src/**/*.{ts,tsx}",
-		"node_modules/melony/node_modules/@melony/ui/**/*.{ts,tsx}",
+		"node_modules/@melony/ui/**/*.{ts,tsx}",
 	],
 	prefix: "",
 	theme: {

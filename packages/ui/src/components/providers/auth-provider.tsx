@@ -1,40 +1,44 @@
 "use client";
 
-import { User } from "@melony/types";
+import {
+	Auth,
+	LoginActionParams,
+	LogoutActionParams,
+	User,
+} from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
-import { LoadingSpinner } from "../loading-spinner";
-import { useApp } from "./app-provider";
 
 type AuthProviderProps = {
 	children: React.ReactNode;
+	auth?: Auth;
 };
 
 export const AuthContext = createContext<{
 	user: User | null;
-	handleLogin: () => void;
-	handleLogout: () => void;
-}>({ user: null, handleLogin: () => {}, handleLogout: () => {} });
+	login?: (params: LoginActionParams) => Promise<any>;
+	logout?: (params: LogoutActionParams) => Promise<any>;
+}>({
+	user: null,
+});
 
-export function AuthProvider({ children }: AuthProviderProps) {
-	const { data, isLoading, refetch } = useQuery({
+export function AuthProvider({ children, auth }: AuthProviderProps) {
+	const loginAction = (auth?.actions || []).find((x) => x.type === "login");
+	const logoutAction = (auth?.actions || []).find((x) => x.type === "logout");
+	const getUserAction = (auth?.actions || []).find((x) => x.type === "getUser");
+
+	const { data: user, isLoading } = useQuery({
 		queryKey: ["getUser"],
-		queryFn: () => null,
+		queryFn: () => getUserAction && getUserAction.handler({}),
 	});
 
-	const handleLogin = () => {};
+	if (isLoading) return <>Loading user...</>;
 
-	const handleLogout = () => {};
-
-	const value = { user: data || null, handleLogin, handleLogout };
-
-	if (isLoading)
-		return (
-			<div className="flex flex-col gap-4 items-center justify-center h-screen w-full">
-				<LoadingSpinner />
-				<div className="text-sm">Loading...</div>
-			</div>
-		);
+	const value = {
+		user,
+		login: loginAction?.handler,
+		logout: logoutAction?.handler,
+	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

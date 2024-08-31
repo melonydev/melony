@@ -24,5 +24,8 @@
   },
   "volta": {
     "node": "20.11.1"
+  },
+  "dependencies": {
+    "@kinde-oss/kinde-auth-nextjs": "2.3.6"
   }
 }

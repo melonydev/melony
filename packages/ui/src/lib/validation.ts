@@ -5,26 +5,24 @@ export function getFieldValidation(field: Field): z.ZodType {
 	let zodType: z.ZodType = z.unknown(); // Default to unknown for flexibility
 
 	switch (field.type) {
-		case "Int":
-		case "BigInt":
-		case "Float":
+		case "number":
 			zodType = z.number();
 			break;
-		case "String":
+		case "text":
+		case "password":
 			zodType = z.string();
 			break;
-		case "Boolean":
+		case "email":
+			zodType = z.string().email();
+			break;
+		case "checkbox":
 			zodType = z.boolean();
 			break;
-		case "DateTime":
-		case "Json": // Handle Json as a passthrough for flexibility
-			zodType = z.string().optional(); // Allow null or string for optional fields
-			break;
-		case "Decimal":
-			zodType = z.string(); // Can be refined based on specific needs
+		case "rich":
+			zodType = z.string();
 			break;
 		default:
-			console.warn(`Unsupported Prisma field type: ${field.type}`);
+			console.warn(`Unsupported field type: ${field.type}`);
 			break;
 	}
 
