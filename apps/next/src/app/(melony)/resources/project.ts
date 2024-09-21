@@ -1,86 +1,89 @@
-import { Resource } from "melony/config";
+import { Field, Resource } from "melony";
 import {
-	createProject,
-	deleteProject,
-	getOneProject,
-	getProjectsList,
-	sendProjectEmail,
-	updateProject,
+	createProjectAction,
+	deleteProjectAction,
+	getOneProjectAction,
+	listProjectsAction,
+	sendProjectEmailAction,
+	updateProjectAction,
 } from "../actions/project";
 import { getCustomerSuggestions } from "../actions/customer";
 import { getUserSuggestions } from "../actions/user";
 import { getProjectStatusSuggestions } from "../actions/project-status";
 
+const fields: Record<string, Field> = {
+	title: { label: "Title" },
+	amount: {
+		label: "Amount",
+		description: "Grand amount of the current project.",
+		type: "number",
+		hasAccess: async ({ user }) => {
+			"use server";
+			return user?.email === "d.daraselia@gmail.com";
+		},
+	},
+	customerId: {
+		label: "Customer",
+		type: "relationship",
+		getSuggestions: getCustomerSuggestions,
+		valueAsNumber: true,
+		displayField: "customer",
+	},
+	ownerId: {
+		label: "Owner",
+		type: "relationship",
+		getSuggestions: getUserSuggestions,
+		valueAsNumber: true,
+		displayField: "owner",
+	},
+	statusId: {
+		label: "Status",
+		type: "relationship",
+		getSuggestions: getProjectStatusSuggestions,
+		valueAsNumber: true,
+		displayField: "status",
+	},
+};
+
 export const projectResource: Resource = {
-	id: "projects",
 	title: "Projects",
-	fields: [
-		{ key: "title", label: "Title" },
-		{
-			key: "amount",
-			label: "Amount",
-			description: "Grand amount of the current project.",
-			type: "number",
-		},
-		{
-			key: "customerId",
-			label: "Customer",
-			type: "relationship",
-			handler: getCustomerSuggestions,
-			valueAsNumber: true,
-			displayField: "customer",
-		},
-		{
-			key: "ownerId",
-			label: "Owner",
-			type: "relationship",
-			handler: getUserSuggestions,
-			valueAsNumber: true,
-			displayField: "owner",
-		},
-		{
-			key: "statusId",
-			label: "Status",
-			type: "relationship",
-			handler: getProjectStatusSuggestions,
-			valueAsNumber: true,
-			displayField: "status",
-		},
-	],
-	actions: [
-		{
-			id: "list",
+	actions: {
+		list: {
+			type: "list",
 			title: "List Projects",
-			type: "getList",
-			handler: getProjectsList,
+			fields: fields,
+			execute: listProjectsAction,
 		},
-		{
-			id: "show",
-			type: "getOne",
-			handler: getOneProject,
+		read: {
+			type: "doc",
+			fields: fields,
+			execute: getOneProjectAction,
 		},
-		{
-			id: "create",
-			type: "create",
-			handler: createProject,
+		create: {
+			type: "form",
+			fields: fields,
+			execute: createProjectAction,
 		},
-		{
-			id: "edit",
-			type: "update",
-			handler: updateProject,
+		update: {
+			type: "form",
+			title: "Edit",
+			fields: fields,
+			isDocRequired: true,
+			execute: updateProjectAction,
 		},
-		{
-			id: "delete",
-			type: "deleteOne",
+		delete: {
+			type: "form",
 			title: "Delete",
-			handler: deleteProject,
+			isDocRequired: true,
+			fields: { id: { isReadOnly: true } },
+			execute: deleteProjectAction,
 		},
-		{
-			id: "send-email",
-			type: "custom",
+		"send-email": {
+			type: "form",
 			title: "Send Email",
-			handler: sendProjectEmail,
-			fields: [{ key: "subject", label: "Email Subject" }],
+			isDocRequired: true,
+			fields: { subject: { label: "Email Subject" } },
+			execute: sendProjectEmailAction,
 		},
-	],
+	},
 };

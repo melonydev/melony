@@ -1,25 +1,32 @@
-import { Resource } from "melony/config";
-import { loginAction, logoutAction } from "../actions/auth";
-import { getUserAction } from "@/actions/auth";
+import { Resource } from "melony";
+
+import {
+	isLoggedInAction,
+	isLoggedOut,
+	loginAction,
+	logoutAction,
+	meAction,
+} from "../actions/auth";
 
 export const authResource: Resource = {
-	id: "auth",
 	title: "Auth",
-	actions: [
-		{
-			id: "login",
-			type: "custom",
-			handler: loginAction,
+	hasAccess: isLoggedOut,
+	actions: {
+		login: {
+			type: "form",
+			title: "Login",
+			execute: loginAction,
 		},
-		{
-			id: "logout",
-			type: "custom",
-			handler: logoutAction,
+
+		logout: {
+			type: "form",
+			hasAccess: isLoggedInAction,
+			execute: logoutAction,
 		},
-		{
-			id: "get-user",
-			type: "custom",
-			handler: getUserAction,
+		me: {
+			type: "doc",
+			hasAccess: isLoggedInAction,
+			execute: meAction,
 		},
-	],
+	},
 };

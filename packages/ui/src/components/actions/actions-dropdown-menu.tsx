@@ -5,26 +5,31 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Action, Resource } from "@melony/types";
+import { Action } from "@melony/types";
 import { MoreHorizontal } from "lucide-react";
 import { ActionsDropdownMenuItem } from "./actions-dropdown-menu-item";
+import { useApp } from "../providers/app-provider";
 
 export function ActionsDropdownMenu({
-	resource,
+	resourceId,
 	data,
-	onClickAction,
 }: {
-	resource: Resource;
+	resourceId: string;
 	data: any;
-	onClickAction: (params: { action: Action; data: any }) => void;
 }) {
-	const resourceDeleteOneAction = (resource?.actions || []).find(
-		(x) => x.type === "deleteOne",
-	);
+	const { navigate, config } = useApp();
 
-	const filteredActions = (resource?.actions || []).filter(
-		(x) => x.type === "custom",
-	);
+	const resource = config?.resources?.[resourceId];
+	const actions = resource?.actions || {};
+
+	const filteredActions = Object.entries(actions).reduce<
+		Record<string, Action>
+	>((acc, [key, value]) => {
+		if (value?.isDocRequired) {
+			acc[key] = value;
+		}
+		return acc;
+	}, {});
 
 	return (
 		<DropdownMenu>
@@ -41,24 +46,22 @@ export function ActionsDropdownMenu({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56" align="end">
 				<DropdownMenuGroup>
-					{resourceDeleteOneAction && (
-						<ActionsDropdownMenuItem
-							action={resourceDeleteOneAction}
-							onClick={() => {
-								onClickAction({ action: resourceDeleteOneAction, data });
-							}}
-						/>
-					)}
+					{Object.keys(filteredActions).map((actionKey) => {
+						const action = actions[actionKey];
 
-					{filteredActions.map((action) => (
-						<ActionsDropdownMenuItem
-							key={action.id}
-							action={action}
-							onClick={() => {
-								onClickAction({ action, data });
-							}}
-						/>
-					))}
+						if (!action) return null;
+
+						return (
+							<ActionsDropdownMenuItem
+								key={actionKey}
+								action={action}
+								onClick={() => {
+									// onClickAction({ action, data });
+									navigate(`/${resourceId}/${actionKey}/${data?.id}`);
+								}}
+							/>
+						);
+					})}
 				</DropdownMenuGroup>
 				{/* <DropdownMenuSeparator /> */}
 			</DropdownMenuContent>

@@ -12,13 +12,13 @@ export const taskResource: Resource = {
 	actions: [
 		{
 			id: "list",
-			type: "getList",
-			handler: getTasksList,
+			type: "list",
+			execute: getTasksList,
 		},
 		{
 			id: "show",
-			type: "getOne",
-			handler: getOneTask,
+			type: "doc",
+			execute: getOneTask,
 		},
 	],
 };

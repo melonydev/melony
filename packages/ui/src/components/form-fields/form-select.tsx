@@ -16,17 +16,23 @@ import {
 } from "../ui/select";
 import { useFormContext } from "react-hook-form";
 
-export function FormSelect({ field }: { field: SelectField }) {
+export function FormSelect({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: SelectField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<Select value={rhfField.value} onValueChange={rhfField.onChange}>
 							<SelectTrigger className="w-[180px]">

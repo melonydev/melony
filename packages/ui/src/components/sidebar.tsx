@@ -4,9 +4,16 @@ interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
 	isCollapsed: boolean;
 	nav: JSX.Element | React.ReactNode;
 	logo: JSX.Element;
+	bottomNav?: JSX.Element;
 }
 
-export function Sidebar({ className, isCollapsed, nav, logo }: SidebarProps) {
+export function Sidebar({
+	className,
+	isCollapsed,
+	nav,
+	logo,
+	bottomNav,
+}: SidebarProps) {
 	return (
 		<aside
 			className={cn(
@@ -17,7 +24,7 @@ export function Sidebar({ className, isCollapsed, nav, logo }: SidebarProps) {
 			<div className="p-2">{logo}</div>
 			<div className="p-2 flex-1 overflow-y-auto">{nav}</div>
 
-			{/* <div className="p-2">{sidebarBottom}</div> */}
+			<div className="p-2">{bottomNav}</div>
 		</aside>
 	);
 }

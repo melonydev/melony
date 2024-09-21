@@ -10,17 +10,23 @@ import {
 import { Textarea } from "../ui/textarea";
 import { RichTextField } from "@melony/types";
 
-export function FormRichText({ field }: { field: RichTextField }) {
+export function FormRichText({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: RichTextField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<Textarea {...rhfField} />
 					</FormControl>

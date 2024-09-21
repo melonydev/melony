@@ -2,11 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig((options) => {
 	return {
-		entry: {
-			config: "src/config/index.ts",
-			auth: "src/auth/index.ts",
-			next: "src/next/index.ts",
-		},
+		entry: ["src/index.ts"],
 		tsconfig: "./tsconfig.json",
 		format: ["esm", "cjs"],
 		splitting: false,

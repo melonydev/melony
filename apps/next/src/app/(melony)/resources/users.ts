@@ -7,9 +7,9 @@ export const userResource: Resource = {
 	fields: [{ key: "image", type: "image" }, { key: "name" }, { key: "email" }],
 	actions: [
 		{
-			id: "get-users",
-			type: "getList",
-			handler: getUsersList,
+			id: "all",
+			type: "list",
+			execute: getUsersList,
 		},
 	],
 };

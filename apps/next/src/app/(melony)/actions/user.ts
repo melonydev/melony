@@ -1,11 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { ListAction } from "melony/config";
 
-export const getUsersList = async () => {
+export const getUsersList: ListAction["execute"] = async () => {
 	const res = await prisma.user.findMany();
 
-	return { rows: res };
+	return { items: res };
 };
 
 export const getUserSuggestions = async () => {

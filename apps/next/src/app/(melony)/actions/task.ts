@@ -2,22 +2,26 @@
 
 import { prisma } from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { GetOneActionParams } from "melony/config";
+import { DocAction, DocActionParams, ListAction } from "melony/config";
 
-export const getTasksList = async () => {
+export const getTasksList: ListAction["execute"] = async () => {
 	const { isAuthenticated } = getKindeServerSession();
 
 	if (!(await isAuthenticated())) {
-		return { rows: [] };
+		return { items: [] };
 	}
 
 	const res = await prisma.task.findMany();
 
-	return { rows: res };
+	return { items: res };
 };
 
-export const getOneTask = async ({ id }: GetOneActionParams) => {
-	return await prisma.task.findUnique({
-		where: { id: Number(id) },
-	});
+export const getOneTask: DocAction["execute"] = async ({
+	id,
+}: DocActionParams) => {
+	return (
+		(await prisma.task.findUnique({
+			where: { id: Number(id) },
+		})) || {}
+	);
 };

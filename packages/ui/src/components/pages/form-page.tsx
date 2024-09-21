@@ -1,43 +1,46 @@
-import { Resource } from "@melony/types";
+import { ID } from "@melony/types";
 import { useMutation } from "@tanstack/react-query";
-import { useApp } from "../providers/app-provider";
 import { Form } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { useToast } from "../ui/use-toast";
 import { Button } from "../ui/button";
 import { Page, PageBody, PageHeader } from "../page";
-import { CheckIcon } from "lucide-react";
 import { FormFields } from "../form-fields";
+import { useDoc } from "../actions/doc-provider";
+import { useApp } from "../providers/app-provider";
 
-export function Create({ resource, ctx }: { resource: Resource; ctx: any }) {
+export function FormPage({
+	resourceId,
+	actionId,
+	id,
+	ctx,
+}: {
+	resourceId: string;
+	actionId: string;
+	id?: ID;
+	ctx: any;
+}) {
 	const { toast } = useToast();
-	const { navigate } = useApp();
+	const { config } = useApp();
 
-	const resourceCreateAction = (resource?.actions || []).find(
-		(x) => x.type === "create",
-	);
+	const resource = config?.resources?.[resourceId];
+	const action = config?.resources?.[resourceId]?.actions?.[actionId];
+
+	const { doc, isLoading } = useDoc();
 
 	const { mutate, isPending } = useMutation<any, any, any>({
-		mutationKey: [resource.id],
-		mutationFn: resourceCreateAction?.handler,
+		mutationKey: [resourceId, actionId],
+		mutationFn: action?.execute,
 	});
-
-	// Define default values for each field
-	const defaultValues = (resource.fields || []).reduce((acc, field) => {
-		return {
-			...acc,
-			[field.key]: field?.default || "",
-		};
-	}, {});
 
 	const form = useForm<any>({
 		// resolver: zodResolver(formSchema),
-		defaultValues,
+		values: { ...doc, id },
 	});
 
 	function onSubmit(data?: any) {
 		mutate(
-			{ data },
+			{ id, data },
 			{
 				onSuccess: () => {
 					// toast({
@@ -61,30 +64,25 @@ export function Create({ resource, ctx }: { resource: Resource; ctx: any }) {
 		);
 	}
 
+	if (isLoading) return <>Loading doc...</>;
+
+	const fields = action?.fields || {};
+
 	return (
 		<Page>
-			<PageHeader>
-				<div className="h-full flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="font-semibold">
-							{resource?.title || resource.id} • Create
-						</div>
-						{resource?.description && <div>{resource.description}</div>}
-					</div>
-
-					<div></div>
-				</div>
-			</PageHeader>
+			<PageHeader
+				title={`${resource?.title || resourceId} • ${action?.title || actionId} ${id && ` • ${id}`}`}
+				description={action?.description}
+			/>
 
 			<PageBody>
 				<div className="container mx-auto max-w-5xl py-8">
 					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-							<FormFields fields={resource.fields || []} />
+						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+							<FormFields fields={fields} />
 
 							<Button type="submit" disabled={isPending}>
-								<CheckIcon className="h-4 w-4 mr-2" />
-								{isPending ? "Creating..." : "Create"}
+								{isPending ? "Executing..." : "Execute"}
 							</Button>
 						</form>
 					</Form>

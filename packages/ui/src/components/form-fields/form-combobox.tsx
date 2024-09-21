@@ -11,22 +11,31 @@ import { Combobox } from "../ui/combobox";
 import { useQuery } from "@tanstack/react-query";
 import { RelationshipField } from "@melony/types";
 
-export function FormCombobox({ field }: { field: RelationshipField }) {
+export function FormCombobox({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: RelationshipField;
+}) {
 	const { control } = useFormContext();
 
 	const { data = [], isLoading } = useQuery({
-		queryKey: [`suggestions-${field.key}`],
-		queryFn: () => field?.handler({ q: "" }),
+		queryKey: [`suggestions-${fieldKey}`],
+		queryFn: () =>
+			field?.getSuggestions
+				? field.getSuggestions({ q: "" })
+				: Promise.resolve([]),
 	});
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<Combobox
 							options={data}

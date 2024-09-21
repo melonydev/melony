@@ -1,4 +1,9 @@
-import { createLayout } from "melony/next";
-import { appConfig } from "../app-config";
+import { AppShell } from "melony";
 
-export default createLayout(appConfig);
+export default function Layout({
+	children,
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
+	return <AppShell>{children}</AppShell>;
+}

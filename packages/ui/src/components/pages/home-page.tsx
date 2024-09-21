@@ -2,44 +2,44 @@ import { Resource } from "@melony/types";
 import { Button } from "../ui/button";
 import { Page, PageBody, PageHeader } from "../page";
 import { useApp } from "../providers/app-provider";
+import { EmptyScreen } from "../empty-screen";
 
-export function ResourcePage({
-	resource,
+export function HomePage({
+	resources = {},
 	ctx,
 }: {
-	resource: Resource;
+	resources?: Record<string, Resource>;
 	ctx: any;
 }) {
 	const { navigate } = useApp();
 
 	return (
 		<Page>
-			<PageHeader>
-				<div className="h-full flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="font-semibold">
-							{resource?.title || resource.id}
-						</div>
-						{resource?.description && <div>{resource.description}</div>}
-					</div>
-
-					<div></div>
-				</div>
-			</PageHeader>
+			<PageHeader title={`Home`} />
 
 			<PageBody>
+				{Object.keys(resources).length === 0 && (
+					<div className="container mx-auto max-w-5xl py-8">
+						<EmptyScreen title="Project has no resources" />
+					</div>
+				)}
+
 				<div className="container mx-auto max-w-5xl py-8">
 					<div className="flex flex-col gap-2">
-						{(resource?.actions || []).map((action) => {
+						{Object.keys(resources).map((resourcekey) => {
+							const resource = resources[resourcekey];
+
+							if (!resource) return null;
+
 							return (
-								<div key={action.id}>
+								<div key={resourcekey}>
 									<Button
 										variant="link"
 										onClick={() => {
-											navigate(`/${resource.id}/${action.id}`);
+											navigate(`/${resourcekey}`);
 										}}
 									>
-										{action?.title || action.id}
+										{resource?.title || resourcekey}
 									</Button>
 								</div>
 							);

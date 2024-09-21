@@ -10,17 +10,23 @@ import {
 import { Input } from "../ui/input";
 import { PasswordField } from "@melony/types";
 
-export function FormPassword({ field }: { field: PasswordField }) {
+export function FormPassword({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: PasswordField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<Input type="password" {...rhfField} />
 					</FormControl>

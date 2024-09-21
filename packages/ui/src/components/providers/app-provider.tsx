@@ -1,27 +1,38 @@
+import { AppConfig } from "@melony/types";
 import { Toaster } from "../ui/toaster";
 import { QueryProvider } from "./query-provider";
+import { redirect, useRouter } from "next/navigation";
 
 import { createContext, useContext } from "react";
+import { AuthProvider } from "./auth-provider";
 
 export const AppContext = createContext<{
+	config: AppConfig;
 	navigate: (path: string) => void;
 }>({
+	config: { title: "Your App Name" },
 	navigate: () => {},
 });
 
 export function AppProvider({
 	children,
-	navigate,
+	config,
 }: {
 	children: React.ReactNode;
-	navigate: (path: string) => void;
+	config: AppConfig;
 }) {
-	const value = { navigate };
+	const router = useRouter();
+
+	const navigate = (path: string) => {
+		router.push(path);
+	};
+
+	const value = { navigate, config };
 
 	return (
 		<AppContext.Provider value={value}>
 			<QueryProvider>
-				{children}
+				<AuthProvider>{children}</AuthProvider>
 				<Toaster />
 			</QueryProvider>
 		</AppContext.Provider>

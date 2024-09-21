@@ -10,17 +10,23 @@ import {
 import { ColorPicker } from "../color-picker";
 import { ColorField } from "@melony/types";
 
-export function FormColor({ field }: { field: ColorField }) {
+export function FormColor({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: ColorField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<ColorPicker {...rhfField} />
 					</FormControl>

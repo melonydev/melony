@@ -1,43 +1,62 @@
 "use client";
 
-import {
-	Auth,
-	LoginActionParams,
-	LogoutActionParams,
-	User,
-} from "@melony/types";
-import { useQuery } from "@tanstack/react-query";
+import { User } from "@melony/types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
+import { useApp } from "./app-provider";
+import { Centered } from "../centered";
+import { LoadingSpinner } from "../loading-spinner";
 
 type AuthProviderProps = {
 	children: React.ReactNode;
-	auth?: Auth;
 };
 
 export const AuthContext = createContext<{
 	user: User | null;
-	login?: (params: LoginActionParams) => Promise<any>;
-	logout?: (params: LogoutActionParams) => Promise<any>;
+	login?: (params: any) => any;
+	logout?: (params: any) => any;
 }>({
 	user: null,
 });
 
-export function AuthProvider({ children, auth }: AuthProviderProps) {
-	const loginAction = (auth?.actions || []).find((x) => x.type === "login");
-	const logoutAction = (auth?.actions || []).find((x) => x.type === "logout");
-	const getUserAction = (auth?.actions || []).find((x) => x.type === "getUser");
+export function AuthProvider({ children }: AuthProviderProps) {
+	const { config } = useApp();
+
+	const authResource = config?.resources?.["auth"];
+	const authResourceActions = authResource?.actions || {};
+
+	const meAction = authResourceActions["me"];
+	const loginAction = authResourceActions["login"];
+	const logoutAction = authResourceActions["logout"];
 
 	const { data: user, isLoading } = useQuery({
-		queryKey: ["getUser"],
-		queryFn: () => getUserAction && getUserAction.handler({}),
+		queryKey: ["me"],
+		queryFn: () => meAction && meAction.execute({}),
+		refetchOnWindowFocus: false,
+		retry: 0,
 	});
 
-	if (isLoading) return <>Loading user...</>;
+	const { mutate: login } = useMutation<any, any, any>({
+		mutationKey: ["login"],
+		mutationFn: loginAction?.execute,
+	});
+
+	const { mutate: logout } = useMutation<any, any, any>({
+		mutationKey: ["logout"],
+		mutationFn: logoutAction?.execute,
+	});
+
+	if (isLoading)
+		return (
+			<Centered>
+				<LoadingSpinner />
+			</Centered>
+		);
 
 	const value = {
-		user,
-		login: loginAction?.handler,
-		logout: logoutAction?.handler,
+		user: (user as User) || null,
+		login,
+		logout,
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

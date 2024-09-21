@@ -1,18 +1,20 @@
 "use server";
 
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { User } from "melony/config";
+import { DocAction, FormAction, HasAccess } from "melony";
 import { redirect } from "next/navigation";
 
 const { getUser } = getKindeServerSession();
 
-export const loginAction = async () => {
+export const loginAction: FormAction["execute"] = async () => {
 	redirect("/api/auth/login");
 };
 
-export const logoutAction = async () => {};
+export const logoutAction: FormAction["execute"] = async () => {
+	redirect("/api/auth/logout");
+};
 
-export const getUserAction = async (): Promise<User> => {
+export const meAction: DocAction["execute"] = async () => {
 	const kindeUser = await getUser();
 
 	if (!kindeUser) throw new Error("User not found");
@@ -21,6 +23,14 @@ export const getUserAction = async (): Promise<User> => {
 		id: kindeUser.id,
 		email: kindeUser.email,
 		picture: kindeUser.picture || undefined,
-		fullName: `${kindeUser.given_name} ${kindeUser.family_name}`,
+		displayName: `${kindeUser.given_name} ${kindeUser.family_name}`,
 	};
+};
+
+export const isLoggedInAction: HasAccess = async ({ user }) => {
+	return Boolean(user);
+};
+
+export const isLoggedOut: HasAccess = async ({ user }) => {
+	return !Boolean(user);
 };

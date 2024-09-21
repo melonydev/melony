@@ -10,17 +10,23 @@ import {
 import { Input } from "../ui/input";
 import { NumberField } from "@melony/types";
 
-export function FormNumber({ field }: { field: NumberField }) {
+export function FormNumber({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: NumberField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
 						<Input
 							type="number"
@@ -28,6 +34,7 @@ export function FormNumber({ field }: { field: NumberField }) {
 							onChange={(e) => {
 								rhfField.onChange(e.target.valueAsNumber);
 							}}
+							disabled={field?.isReadOnly}
 						/>
 					</FormControl>
 					{field?.description && (

@@ -21,7 +21,13 @@ const packFiles = (files: any) => {
 	return data;
 };
 
-export function FormImage({ field }: { field: ImageField }) {
+export function FormImage({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: ImageField;
+}) {
 	const mutate = (data: any, options: any) => {};
 	const isPending = false;
 
@@ -47,7 +53,7 @@ export function FormImage({ field }: { field: ImageField }) {
 				<AvatarFallback></AvatarFallback>
 			</Avatar>
 			<FormItem>
-				<FormLabel>{field?.label || field.key}</FormLabel>
+				<FormLabel>{field?.label || fieldKey}</FormLabel>
 				<FormControl>
 					<div>
 						<Input

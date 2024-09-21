@@ -1,4 +1,10 @@
-import { appConfig } from "@/app/app-config";
-import { createPage } from "melony/next";
+import { DynamicPage } from "melony";
 
-export default createPage(appConfig);
+export default function Page({
+	children,
+	...rest
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
+	return <DynamicPage {...rest}>{children}</DynamicPage>;
+}

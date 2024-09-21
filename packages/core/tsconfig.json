@@ -2,28 +2,30 @@
 	"extends": "@repo/typescript-config/react-library.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"outDir": "dist",
 		"paths": {
 			"@/*": ["./src/*"],
 			"react": ["./node_modules/@types/react"]
 		},
 		"resolveJsonModule": true,
-		"types": ["node"],
 		"noEmit": true,
 		"allowJs": true,
 		"noUnusedLocals": true,
 		"preserveSymlinks": false,
-		"strict": true,
 		"strictNullChecks": true,
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
 		"isolatedModules": true,
 		"lib": ["ESNext", "DOM"],
+		"importHelpers": true,
+
+		"target": "ES2018",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"declaration": true,
+		"strict": true,
+		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"importHelpers": true
+		"forceConsistentCasingInFileNames": true,
+		"jsx": "react",
+		"outDir": "dist"
 	},
 	"include": ["src"],
 	"exclude": ["node_modules", "dist"]

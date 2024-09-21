@@ -1,46 +1,40 @@
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Action, ID } from "@melony/types";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { Form } from "../ui/form";
-import { FormFields } from "../form-fields";
-import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
 import { useToast } from "../ui/use-toast";
+import { Button } from "../ui/button";
+import { Page, PageBody, PageHeader } from "../page";
+import { FormFields } from "../form-fields";
+import { useApp } from "../providers/app-provider";
+import { Action, Resource } from "@melony/types";
 
-export function ActionDialog({
-	open,
-	onClose,
+export function IdActionPage({
+	resource,
 	action,
-	data,
-	id,
 }: {
-	open?: boolean;
-	onClose: () => void;
+	resource: Resource;
 	action: Action;
-	data?: any;
-	id: ID;
 }) {
+	const { navigate } = useApp();
 	const { toast } = useToast();
 
 	const { mutate, isPending } = useMutation<any, any, any>({
-		mutationKey: [action.id],
-		mutationFn: action?.handler,
+		mutationKey: ["idAction"],
+		mutationFn: async ({ data: { id } }) => {
+			navigate(`/${resource.id}/${action.id}/${id}`);
+		},
 	});
 
 	const form = useForm<any>({
 		// resolver: zodResolver(formSchema),
-		values: data,
+		values: {
+			id: "",
+		},
 	});
 
 	function onSubmit(data?: any) {
 		mutate(
-			{ id, data },
+			{ data },
 			{
 				onSuccess: () => {
 					// toast({
@@ -65,18 +59,17 @@ export function ActionDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>{action?.title || action.id}</DialogTitle>
-					<DialogDescription>{action?.description || id}</DialogDescription>
-				</DialogHeader>
-				<div className="grid gap-4 p-4">
+		<Page>
+			<PageHeader
+				title={`${resource?.title || resource.id} • ${action?.title || action.id}`}
+				description={action?.description}
+			/>
+
+			<PageBody>
+				<div className="container mx-auto max-w-5xl py-8">
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-							{action.type === "custom" && action?.fields && (
-								<FormFields fields={action.fields} />
-							)}
+							<FormFields fields={[{ key: "id", label: "ID" }]} />
 
 							<Button type="submit" disabled={isPending}>
 								{isPending ? "Executing..." : "Execute"}
@@ -84,7 +77,7 @@ export function ActionDialog({
 						</form>
 					</Form>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</PageBody>
+		</Page>
 	);
 }

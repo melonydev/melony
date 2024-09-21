@@ -10,19 +10,25 @@ import {
 import { Input } from "../ui/input";
 import { TextField } from "@melony/types";
 
-export function FormText({ field }: { field: TextField }) {
+export function FormText({
+	fieldKey,
+	field,
+}: {
+	fieldKey: string;
+	field: TextField;
+}) {
 	const { control } = useFormContext();
 
 	return (
 		<FormField
-			key={field.key}
+			key={fieldKey}
 			control={control}
-			name={field.key}
+			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || field.key}</FormLabel>
+					<FormLabel>{field?.label || fieldKey}</FormLabel>
 					<FormControl>
-						<Input {...rhfField} />
+						<Input {...rhfField} disabled={field?.isReadOnly} />
 					</FormControl>
 					{field?.description && (
 						<FormDescription>{field?.description}</FormDescription>
