@@ -1,81 +1,86 @@
-# Turborepo starter
+# Melony
 
-This is an official starter Turborepo.
+## About
 
-## Using this example
+Melony is a powerful and flexible admin panel generator designed exclusively for Next.js applications. It empowers backend developers to create sophisticated, beautiful, and consistent internal tools without writing a single line of frontend code. By leveraging Next.js's server-side capabilities, Melony allows you to define your entire admin interface using simple JavaScript objects, transforming your data models and business logic into a fully-functional, visually appealing admin panel.
 
-Run the following command:
+## Key Features
 
-```sh
-npx create-turbo@latest
-```
+- **Next.js Optimized**: Built from the ground up for Next.js, utilizing its API routes and server-side rendering capabilities.
+- **Zero Frontend Code**: Create full-fledged admin panels using only backend configurations.
+- **Beautiful UI**: Crafted to make your internal tools visually appealing out of the box.
+- **Consistent Design**: Ensures a uniform look and feel across all your admin interfaces.
+- **Dynamic View Generation**: Easily create list, detail, and form views with simple configuration.
+- **Flexible Context Handling**: Support for asynchronous context loading in views and tabs.
+- **Customizable Components**: Extensible set of UI components that maintain design consistency.
+- **Type-Safe**: Built with TypeScript for robust type checking and enhanced developer experience.
+- **Responsive Design**: Mobile-friendly interface that adapts to various screen sizes.
+- **Role-Based Access Control**: Built-in support for managing user permissions.
 
-## What's inside?
+## Our Goal
 
-This Turborepo includes the following packages/apps:
+At Melony, our mission is to revolutionize the creation of internal tools for Next.js applications. We believe that backend developers should be able to create beautiful, consistent, and functional admin interfaces without the need to dive into frontend code. Our goal is to make the process of building internal tools as efficient and enjoyable as possible, while ensuring that the end result is visually appealing and user-friendly.
 
-### Apps and Packages
+## Quick Start
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+1. Install Melony in your Next.js project:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+   ```
+   npm install melony
+   ```
 
-### Utilities
+2. Define your views in your Next.js API routes:
 
-This Turborepo has some additional tools already setup for you:
+   ```typescript
+   // pages/api/admin/views/projects.ts
+   import { View } from "melony/config";
+   import { listProjectsAction } from "../actions/projects";
+   import { projectFields } from "../fields/projects";
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+   export const projectsListView: View = {
+   	type: "list",
+   	title: "Projects",
+   	fields: projectFields,
+   	action: listProjectsAction,
+   	headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
+   	itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
+   	onItemClick: { viewId: "projectDetailedView" },
+   	showInNavigation: true,
+   };
 
-### Build
+   export default projectsListView;
+   ```
 
-To build all apps and packages, run the following command:
+3. Set up your admin panel in a Next.js page:
 
-```
-cd my-turborepo
-pnpm build
-```
+   ```typescript
+   // pages/admin/[[...path]].tsx
+   import { MelonyProvider, AdminPanel } from 'melony';
+   import projectsListView from '../api/admin/views/projects';
 
-### Develop
+   const AdminPage = () => (
+     <MelonyProvider views={[projectsListView]}>
+       <AdminPanel />
+     </MelonyProvider>
+   );
 
-To develop all apps and packages, run the following command:
+   export default AdminPage;
+   ```
 
-```
-cd my-turborepo
-pnpm dev
-```
+And that's it! Your beautiful, consistent admin panel is now ready to use, without writing a single line of frontend code.
 
-### Remote Caching
+## Documentation
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+For detailed documentation, please visit our [Wiki](link-to-your-wiki).
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+## Examples
 
-```
-cd my-turborepo
-npx turbo login
-```
+Check out our [examples directory](link-to-examples) for more sample configurations and usage scenarios.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Contributing
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+We welcome contributions to make Melony even better! Please see our [Contributing Guide](link-to-contributing-guide) for more details.
 
-```
-npx turbo link
-```
+## License
 
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+Melony is [MIT licensed](link-to-license).
