@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder } from "lucide-react";
+import * as icons from "lucide-react";
 import { cn } from "../lib";
 import React from "react";
 
@@ -35,35 +35,31 @@ export function Navigation({
 }
 
 export function NavigationItem({
-	as,
+	id,
 	title,
-	icon,
-	href,
+	onClick,
 }: {
-	as: any;
+	id?: string;
 	title?: string;
-	icon?: any;
-	href: string;
+	icon?: string;
+	onClick?: () => void;
 }) {
-	const Comp = as || "div";
-
 	const navContext = React.useContext(NavigationContext);
 
 	return (
-		<Comp
+		<div
 			className={cn(
-				"px-2 h-8 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
+				"px-3 h-8 text-foreground/60 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
 				{
-					"text-accent-foreground bg-muted": navContext.activePathname === href,
+					"text-accent-foreground bg-muted": navContext.activePathname === id,
 				},
 			)}
-			href={href}
 			onClick={() => {
-				navContext.setPathname(href);
+				onClick && onClick();
 			}}
 		>
-			<Folder className="h-4 w-4 mr-2" />
+			{/* {Icon && <Icon className="h-4 w-4 mr-3" />} */}
 			<span className="block truncate">{title}</span>
-		</Comp>
+		</div>
 	);
 }

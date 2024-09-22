@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String   @default("")
+  lastName  String   @default("")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("users")
+}
+
+model Customer {
+  id        Int        @id @default(autoincrement())
+  firstName String     @default("")
+  lastName  String     @default("")
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @map("updated_at")
+  deviceId  String
+  devices   Device[]
+  locations Location[]
+  products  Product[]
+  scans     Scan[]
+
+  @@map("customers")
+}
+
+model Device {
+  id         Int      @id @default(autoincrement())
+  deviceId   String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  @@map("devices")
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+  manufacturer      String
+  productExternalId String
+  model             String
+  tickeType         String
+  madeIn            String
+  region            String
+  customerId        Int
+  customer          Customer @relation(fields: [customerId], references: [id])
+  scans             Scan[]
+
+  @@map("products")
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  lat        Float
+  long       Float
+  region     String
+  country    String
+  city       String
+  customerId Int
+  address    String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  scans      Scan[]
+
+  @@map("locations")
+}
+
+model Scan {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  authentic  Boolean
+  locationId Int
+  customerId Int
+  deviceId   String
+  productId  Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
+  products   Product  @relation(fields: [productId], references: [id])
+
+  @@map("scans")
+}

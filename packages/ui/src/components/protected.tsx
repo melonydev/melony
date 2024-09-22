@@ -1,5 +1,4 @@
 import { useAuth } from "./providers/auth-provider";
-import { SmartAuth } from "./smart/smart-auth";
 
 export function Protected({
 	children,
@@ -8,7 +7,7 @@ export function Protected({
 }) {
 	const { user } = useAuth();
 
-	if (!user) return <SmartAuth />;
+	if (!user) return <>unauthenticated</>;
 
 	return children;
 }

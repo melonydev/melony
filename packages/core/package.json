@@ -1,38 +1,9 @@
 {
 	"name": "melony",
-	"version": "0.0.2",
-	"exports": {
-		"./core": {
-			"import": {
-				"types": "./dist/core.d.mts",
-				"default": "./dist/core.mjs"
-			},
-			"require": {
-				"types": "./dist/core.d.ts",
-				"default": "./dist/core.js"
-			}
-		},
-		"./next": {
-			"import": {
-				"types": "./dist/next.d.mts",
-				"default": "./dist/next.mjs"
-			},
-			"require": {
-				"types": "./dist/next.d.ts",
-				"default": "./dist/next.js"
-			}
-		},
-		"./prisma": {
-			"import": {
-				"types": "./dist/prisma.d.mts",
-				"default": "./dist/prisma.mjs"
-			},
-			"require": {
-				"types": "./dist/prisma.d.ts",
-				"default": "./dist/prisma.js"
-			}
-		}
-	},
+	"version": "0.0.11",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"dev": "npm run build -- --watch",
 		"lint": "eslint . --max-warnings 0",
@@ -42,29 +13,17 @@
 		"publish": "npm publish --access public"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "3.583.0",
 		"@melony/types": "workspace:*",
-		"@melony/ui": "workspace:*",
-		"@prisma/client": "5.14.0",
-		"bcryptjs": "2.4.3",
-		"jose": "5.3.0",
-		"next": "14.2.3",
-		"react": "18.3.1",
-		"server-only": "0.0.1",
-		"tsup": "8.0.2"
+		"@melony/ui": "workspace:*"
 	},
 	"peerDependencies": {
-		"@prisma/client": "5.14.0",
-		"@types/react": "18.3.1",
 		"react": "18.3.1",
 		"react-dom": "^18"
 	},
 	"devDependencies": {
-		"@types/bcryptjs": "2.4.6",
-		"@types/node": "20.12.12",
 		"@types/react": "18.3.1",
 		"@types/react-dom": "^18",
-		"next": "14.2.3",
-		"react-dom": "^18"
+		"react-dom": "^18",
+		"tsup": "8.0.2"
 	}
 }

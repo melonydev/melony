@@ -3,86 +3,79 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Project {
-  id         String        @id @default(auto()) @map("_id") @db.ObjectId
-  title      String /// displayField
+  id         Int           @id @default(autoincrement())
+  title      String
   amount     Float?        @default(0)
   customer   Customer      @relation(fields: [customerId], references: [id])
-  customerId String        @db.ObjectId
+  customerId Int
   owner      User          @relation(fields: [ownerId], references: [id])
-  ownerId    String        @db.ObjectId
+  ownerId    Int
   status     ProjectStatus @relation(fields: [statusId], references: [id])
-  statusId   String        @db.ObjectId
+  statusId   Int
   tasks      Task[]
 }
 
 model ProjectStatus {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  title    String /// displayField
-  color    String /// component=Color
+  id       Int       @id @default(autoincrement())
+  title    String
+  color    String
   projects Project[]
 }
 
 model Task {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  id          Int        @id @default(autoincrement())
   title       String /// displayField
   item        Item       @relation(fields: [itemId], references: [id])
-  itemId      String     @db.ObjectId
+  itemId      Int
   project     Project    @relation(fields: [projectId], references: [id])
-  projectId   String     @db.ObjectId
+  projectId   Int
   status      TaskStatus @relation(fields: [statusId], references: [id])
-  statusId    String     @db.ObjectId
+  statusId    Int
   price       Float
   description String?    @default("")
   owner       User       @relation(fields: [ownerId], references: [id])
-  ownerId     String     @db.ObjectId
+  ownerId     Int
 }
 
 model TaskStatus {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  title String /// displayField
-  color String /// component=Color
+  id    Int    @id @default(autoincrement())
+  title String
+  color String
   tasks Task[]
 }
 
-/// some comment here
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  image    String? /// component=Image
-  email    String /// displayField
+  id       Int       @id @default(autoincrement())
+  image    String?
+  email    String
   password String?
   name     String?
   projects Project[]
   tasks    Task[]
 }
 
-/// layout=Cards
 model File {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  downloadUrl String /// component=Image
-  name        String /// displayField
+  id          Int    @id @default(autoincrement())
+  downloadUrl String
+  name        String
 }
 
 model Customer {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  title    String /// displayField
+  id       Int       @id @default(autoincrement())
+  title    String
   projects Project[]
 }
 
-enum ItemType {
-  MATERIAL
-  PRODUCT
-}
-
 model Item {
-  id    String   @id @default(auto()) @map("_id") @db.ObjectId
-  title String /// displayField
+  id    Int    @id @default(autoincrement())
+  title String
   sku   String
-  price Float?   @default(0)
-  type  ItemType
+  price Float? @default(0)
+  type  String
   tasks Task[]
 }

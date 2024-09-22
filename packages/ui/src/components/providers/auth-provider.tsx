@@ -1,10 +1,11 @@
 "use client";
 
 import { User } from "@melony/types";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
-import { LoadingSpinner } from "../loading-spinner";
 import { useApp } from "./app-provider";
+import { Centered } from "../centered";
+import { LoadingSpinner } from "../loading-spinner";
 
 type AuthProviderProps = {
 	children: React.ReactNode;
@@ -12,35 +13,50 @@ type AuthProviderProps = {
 
 export const AuthContext = createContext<{
 	user: User | null;
-	handleLogin: () => void;
-	handleLogout: () => void;
-}>({ user: null, handleLogin: () => {}, handleLogout: () => {} });
+	login?: (params: any) => any;
+	logout?: (params: any) => any;
+}>({
+	user: null,
+});
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { getUserAction } = useApp();
+	const { config } = useApp();
 
-	const { data, isLoading, refetch } = useQuery({
-		queryKey: ["getUser"],
-		queryFn: () => getUserAction(),
+	const authResourceActions: any = {};
+
+	const meAction = authResourceActions["me"];
+	const loginAction = authResourceActions["login"];
+	const logoutAction = authResourceActions["logout"];
+
+	const { data: user, isLoading } = useQuery({
+		queryKey: ["me"],
+		queryFn: () => meAction && meAction.execute({}),
+		refetchOnWindowFocus: false,
+		retry: 0,
 	});
 
-	const handleLogin = () => {
-		refetch();
-	};
+	const { mutate: login } = useMutation<any, any, any>({
+		mutationKey: ["login"],
+		mutationFn: loginAction?.execute,
+	});
 
-	const handleLogout = () => {
-		refetch();
-	};
-
-	const value = { user: data, handleLogin, handleLogout };
+	const { mutate: logout } = useMutation<any, any, any>({
+		mutationKey: ["logout"],
+		mutationFn: logoutAction?.execute,
+	});
 
 	if (isLoading)
 		return (
-			<div className="flex flex-col gap-4 items-center justify-center h-screen w-full">
+			<Centered>
 				<LoadingSpinner />
-				<div className="text-sm">Launching...</div>
-			</div>
+			</Centered>
 		);
+
+	const value = {
+		user: (user as User) || null,
+		login,
+		logout,
+	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

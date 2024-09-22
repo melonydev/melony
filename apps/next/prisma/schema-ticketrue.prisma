@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String   @default("")
+  lastName  String   @default("")
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("users")
+}
+
+model Customer {
+  id        Int        @id @default(autoincrement())
+  firstName String     @default("")
+  lastName  String     @default("")
+  email     String
+  password  String
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @default(now()) @map("updated_at")
+  deviceId  String
+  products  Product[]
+  scans     Scan[]
+  locations Location[]
+  devices   Device[]
+
+  @@unique([email], name: "customers_email_unique")
+  @@map("customers")
+}
+
+model Device {
+  id         Int      @id @default(autoincrement())
+  deviceId   String   @default("")
+  createdAt  DateTime @default(now()) @map("created_at")
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  @@map("devices")
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @default(now()) @map("updated_at")
+  manufacturer      String
+  productExternalId String
+  model             String
+  tickeType         String
+  madeIn            String
+  region            String
+  customerId        Int
+  customer          Customer @relation(fields: [customerId], references: [id])
+
+  @@map("products")
+}
+
+model Location {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+  lat        Float
+  long       Float
+  region     String
+  country    String
+  city       String
+  address    String?
+  scans      Scan[]
+  customerId Int
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("locations")
+}
+
+model Scan {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @default(now()) @map("updated_at")
+  authentic  Boolean
+  deviceId   String
+  locationId Int
+  location   Location  @relation(fields: [locationId], references: [id])
+  customerId Int
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("scans")
+}

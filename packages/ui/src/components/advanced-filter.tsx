@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Filter, Trash } from "lucide-react";
-import { Field, FilterItem, Model } from "@melony/types";
+import { Field, FilterItem, Model, Resource } from "@melony/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import {
@@ -20,7 +20,7 @@ export const convertFieldsToFilterTokens = (fields: Field[]) => {
 	const filterTokens: FilterTokenProps[] = [];
 
 	fields.map((field) => {
-		if (["String", "Boolean", "Int"].includes(field.type || "")) {
+		if (["text", "checkbox", "number"].includes(field.type || "")) {
 			filterTokens.push({
 				defaultOperator: "Contains",
 				availableOperators: ["Is", "Contains", "DoesNotContain", "IsAnyOf"],
@@ -49,17 +49,17 @@ export type AdvancedFilterProps = {
 };
 
 export function AdvancedFilter({
-	model,
+	resource,
 	values,
 	onChange,
 }: {
-	model: Model;
+	resource: Resource;
 	values: FilterItem[];
 	onChange: (filter: FilterItem[]) => void;
 }) {
 	const [open, setOpen] = React.useState(false);
 
-	const filterTokens = convertFieldsToFilterTokens(model.fields);
+	const filterTokens = convertFieldsToFilterTokens(resource?.fields || []);
 
 	const defaultField =
 		filterTokens.find((field) => field.isDefault) || filterTokens[0];
@@ -67,7 +67,7 @@ export function AdvancedFilter({
 	const handleAddFilter = () => {
 		const newValues = [...values];
 		newValues.push({
-			field: defaultField?.field?.name || "",
+			field: defaultField?.field?.path || "",
 			operator: defaultField?.defaultOperator || "Contains",
 			value: "",
 		});
@@ -89,7 +89,7 @@ export function AdvancedFilter({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="ghost">
+				<Button variant="outline">
 					<Filter className="h-4 w-4 mr-2" />
 					Filter{" "}
 					{values.length > 0 && (
@@ -145,14 +145,14 @@ export function AdvancedFilterItem(props: FilterItemProps) {
 
 	const splittedField = value.field.split("."); // if there is like task.id split and use just a task
 	const currentField = filterTokens.find(
-		(x) => x.field.name === splittedField[0],
+		(x) => x.field.path === splittedField[0],
 	);
 
 	const handleChangeField = (field: string) => {
 		let val = value.value;
 
 		// TODO: we need to set checkbox to false by default
-		if (currentField?.field?.type === "CHECKBOX") {
+		if (currentField?.field?.type === "checkbox") {
 			val = false;
 		}
 
@@ -182,7 +182,7 @@ export function AdvancedFilterItem(props: FilterItemProps) {
 		<div className="flex items-center gap-2 mb-2">
 			<div className="w-36">
 				<Select
-					value={currentField?.field.name}
+					value={currentField?.field.path}
 					onValueChange={(value) => handleChangeField(value)}
 				>
 					<SelectTrigger className="w-full h-10">
@@ -192,8 +192,8 @@ export function AdvancedFilterItem(props: FilterItemProps) {
 						<SelectGroup>
 							{filterTokens.map((token) => {
 								return (
-									<SelectItem key={token.field.name} value={token.field.name}>
-										{token.field?.name || "unknown"}
+									<SelectItem key={token.field.path} value={token.field.path}>
+										{token.field?.path || "unknown"}
 									</SelectItem>
 								);
 							})}

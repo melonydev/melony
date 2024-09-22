@@ -8,46 +8,49 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "./providers/auth-provider";
-import { useApp } from "./providers/app-provider";
+import { stringToColor } from "@/lib/string-to-color";
 
 export function AccountPopover() {
-	const { user, handleLogout } = useAuth();
-	const { logoutAction } = useApp();
+	const { user, logout } = useAuth();
 
-	const { mutate: logout } = useMutation({
-		mutationKey: ["logout"],
-		mutationFn: () => logoutAction(),
-		onSuccess: () => {
-			handleLogout();
-		},
-	});
+	if (!user) return null;
 
 	return (
 		<div className="flex flex-col gap-1">
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<div className="flex items-center cursor-pointer hover:bg-muted rounded-lg px-2 py-1">
-						<Avatar className="h-7 w-7 mr-2">
-							<AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-							<AvatarFallback className="text-xs">
-								{(user?.name || "").slice(0, 2).toUpperCase()}
+						<Avatar className="h-7 w-7 border shadow mr-2">
+							<AvatarImage
+								src={user?.picture || ""}
+								alt={user?.displayName || ""}
+							/>
+							<AvatarFallback>
+								<div
+									className="absolute opacity-40 inset-0"
+									style={{
+										backgroundColor: stringToColor(user?.displayName || ""),
+									}}
+								></div>
+								<span className="text-[9px] font-semibold">
+									{(user?.displayName || "").slice(0, 2).toUpperCase()}
+								</span>
 							</AvatarFallback>
 						</Avatar>
 
 						<div className="text-left">
-							<div className="text-sm">{user?.name}</div>
+							<div className="text-sm">{user?.displayName}</div>
 							<div className="text-xs opacity-60">{user?.email}</div>
 						</div>
 					</div>
 				</DropdownMenuTrigger>
 
-				<DropdownMenuContent className="w-56">
-					<DropdownMenuLabel>My Account</DropdownMenuLabel>
+				<DropdownMenuContent className="w-56" align="start">
+					<DropdownMenuLabel>{user?.email || user?.id}</DropdownMenuLabel>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<DropdownMenuItem onClick={() => logout()}>
+						<DropdownMenuItem onClick={() => logout && logout({})}>
 							<span>Logout</span>
 						</DropdownMenuItem>
 					</DropdownMenuGroup>

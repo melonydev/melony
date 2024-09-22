@@ -1,67 +1,42 @@
-"use client";
+import { AppConfig } from "@melony/types";
+import { Toaster } from "../ui/toaster";
+import { QueryProvider } from "./query-provider";
+import { redirect, useRouter } from "next/navigation";
 
-import {
-	Action,
-	CreateActionPayload,
-	DeleteActionPayload,
-	ListActionPayload,
-	LoginActionPayload,
-	Model,
-	UpdateActionPayload,
-} from "@melony/types";
 import { createContext, useContext } from "react";
+import { AuthProvider } from "./auth-provider";
 
-type DefaultActions = {
-	listAction: ({ model }: ListActionPayload) => Promise<any>;
-	createAction: ({ model, data }: CreateActionPayload) => Promise<any>;
-	updateAction: ({ model, data }: UpdateActionPayload) => Promise<any>;
-	deleteAction: ({ model, where }: DeleteActionPayload) => Promise<any>;
-
-	loginAction: (payload: LoginActionPayload) => Promise<any>;
-	logoutAction: () => Promise<any>;
-	getUserAction: () => Promise<any>;
-
-	uploadAction: ({ formData }: { formData: FormData }) => Promise<any>;
-};
-
-type AppProviderProps = {
-	children: React.ReactNode;
-	actions?: Record<string, Action[]>;
-	models?: Model[];
-} & DefaultActions;
-
-const AppContext = createContext<
-	{
-		models?: Model[];
-		actions?: Record<string, Action[]>;
-		getModelActions: (modelName: string) => Action[];
-	} & DefaultActions
->({
-	getModelActions: () => [],
-	listAction: () => Promise.resolve(),
-	createAction: () => Promise.resolve(),
-	updateAction: () => Promise.resolve(),
-	deleteAction: () => Promise.resolve(),
-
-	loginAction: () => Promise.resolve(),
-	logoutAction: () => Promise.resolve(),
-	getUserAction: () => Promise.resolve(),
-	uploadAction: () => Promise.resolve(),
+export const AppContext = createContext<{
+	config: AppConfig;
+	navigate: (path: string) => void;
+}>({
+	config: { title: "Your App Name" },
+	navigate: () => {},
 });
 
 export function AppProvider({
 	children,
-	actions,
-	models,
-	...rest
-}: AppProviderProps) {
-	const getModelActions = (modelName: string) => {
-		return actions?.[modelName] || [];
+	config,
+}: {
+	children: React.ReactNode;
+	config: AppConfig;
+}) {
+	const router = useRouter();
+
+	const navigate = (path: string) => {
+		router.push(path);
 	};
 
-	const value = { getModelActions, actions, models, ...rest };
+	const value = { navigate, config };
 
-	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+	return (
+		<AppContext.Provider value={value}>
+			<QueryProvider>
+				<AuthProvider>{children}</AuthProvider>
+				<Toaster />
+			</QueryProvider>
+		</AppContext.Provider>
+	);
 }
 
 export const useApp = () => {
