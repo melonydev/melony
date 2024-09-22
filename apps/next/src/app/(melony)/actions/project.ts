@@ -1,24 +1,27 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { filterToPrismaQuery, prisma } from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { DocAction, FormAction, ListAction } from "melony";
+import { DetailView, FormView, ListView } from "melony";
 
-export const listProjectsAction: ListAction["execute"] = async () => {
+export const listProjectsAction: ListView["action"] = async ({ filter }) => {
 	const { isAuthenticated } = getKindeServerSession();
 
 	if (!(await isAuthenticated())) {
 		return { items: [], meta: {} };
 	}
 
+	const where = filterToPrismaQuery(filter || []);
+
 	const res = await prisma.project.findMany({
 		include: { customer: true, owner: true, status: true },
+		where,
 	});
 
 	return { items: res, meta: {} };
 };
 
-export const getOneProjectAction: DocAction["execute"] = async ({ id }) => {
+export const getOneProjectAction: DetailView["action"] = async ({ id }) => {
 	const doc = await prisma.project.findUnique({
 		where: { id: Number(id) },
 		include: { customer: true, owner: true, status: true },
@@ -27,7 +30,7 @@ export const getOneProjectAction: DocAction["execute"] = async ({ id }) => {
 	return doc || {};
 };
 
-export const createProjectAction: FormAction["execute"] = async ({ data }) => {
+export const createProjectAction: FormView["action"] = async ({ data }) => {
 	await prisma.project.create({
 		data,
 	});
@@ -35,10 +38,7 @@ export const createProjectAction: FormAction["execute"] = async ({ data }) => {
 	return { type: "notify", message: "Success" };
 };
 
-export const updateProjectAction: FormAction["execute"] = async ({
-	id,
-	data,
-}) => {
+export const updateProjectAction: FormView["action"] = async ({ id, data }) => {
 	await prisma.project.update({
 		where: { id: Number(id) },
 		data,
@@ -47,7 +47,7 @@ export const updateProjectAction: FormAction["execute"] = async ({
 	return { type: "notify", message: "Success" };
 };
 
-export const deleteProjectAction: FormAction["execute"] = async ({ id }) => {
+export const deleteProjectAction: FormView["action"] = async ({ id }) => {
 	await prisma.project.delete({
 		where: { id: Number(id) },
 	});
@@ -55,7 +55,7 @@ export const deleteProjectAction: FormAction["execute"] = async ({ id }) => {
 	return { type: "notify", message: "Success" };
 };
 
-export const sendProjectEmailAction: FormAction["execute"] = async ({
+export const sendProjectEmailAction: FormView["action"] = async ({
 	id,
 	data,
 }) => {

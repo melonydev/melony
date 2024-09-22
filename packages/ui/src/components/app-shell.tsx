@@ -15,7 +15,7 @@ export function AppShell({
 	const { config, navigate } = useApp();
 
 	const title = config.title;
-	const resources = config?.resources || {};
+	const views = config?.views || {};
 
 	const logo = (
 		<div className="flex items-center gap-1">
@@ -26,18 +26,19 @@ export function AppShell({
 	const nav = (
 		<Navigation>
 			<>
-				{Object.keys(resources).map((resourceKey) => {
-					const resource = resources[resourceKey];
+				{Object.keys(views).map((viewId) => {
+					const view = views[viewId];
 
-					if (!resource) return null;
+					if (!view) return null;
+					if (!view?.showInNavigation) return null;
 
 					return (
 						<NavigationItem
-							key={resourceKey}
-							id={resourceKey}
-							title={resource?.title || resourceKey}
+							key={viewId}
+							id={viewId}
+							title={view?.title || viewId}
 							onClick={() => {
-								navigate(`/${resourceKey}`);
+								navigate(`/${viewId}`);
 							}}
 						/>
 					);

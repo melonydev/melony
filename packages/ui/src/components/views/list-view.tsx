@@ -1,15 +1,13 @@
-import { Field } from "@melony/types";
+import { BaseContext, Field, ListView as ListViewTD } from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "../data-table";
 import { useApp } from "../providers/app-provider";
-import { Page, PageBody, PageHeader } from "../page";
 import { ColumnDef } from "@tanstack/react-table";
 import { DEFAULT_COMPONENTS_MAP } from "@/constants";
 import { ActionsDropdownMenu } from "../actions/actions-dropdown-menu";
-import { ActionsStack } from "../actions/actions-stack";
 
 const convertFieldsToColumns = (
-	resourceId: string,
+	viewId: string,
 	fields: Record<string, Field>,
 ) => {
 	const columns: ColumnDef<any, any>[] = Object.keys(fields).map((fieldKey) => {
@@ -42,52 +40,39 @@ const convertFieldsToColumns = (
 		id: "actions",
 		size: 34,
 		cell: ({ row }) => {
-			return (
-				<ActionsDropdownMenu resourceId={resourceId} data={row.original} />
-			);
+			return <ActionsDropdownMenu viewId={viewId} data={row.original} />;
 		},
 	});
 
 	return columns;
 };
 
-export function ListPage({
-	resourceId,
+export function ListView({
+	viewId,
 	ctx,
 }: {
-	resourceId: string;
-	ctx: any;
+	viewId: string;
+	ctx: BaseContext;
 }) {
 	const { navigate, config } = useApp();
 
-	const resource = config?.resources?.[resourceId];
-	const action = resource?.actions?.list;
+	const view = config?.views?.[viewId] as ListViewTD;
 
 	const { data, isLoading } = useQuery({
-		queryKey: [resourceId, "list"],
-		queryFn: () => action?.execute({}),
+		queryKey: [viewId, ctx],
+		queryFn: () => view?.action({ filter: ctx?.initialFilter || [] }),
 	});
 
-	if (!resource) return null;
+	if (!view) return null;
 
 	return (
-		<Page>
-			<PageHeader
-				title={`${resource?.title || resourceId} • List`}
-				description={resource?.description}
-				actions={<ActionsStack resourceId={resourceId} />}
-			/>
-
-			<PageBody>
-				<DataTable<any, any>
-					isLoading={isLoading}
-					columns={convertFieldsToColumns(resourceId, action?.fields || {})}
-					data={data?.items || []}
-					onClickRow={(item) => {
-						navigate(`/${resourceId}/read/${item.id}`);
-					}}
-				/>
-			</PageBody>
-		</Page>
+		<DataTable<any, any>
+			isLoading={isLoading}
+			columns={convertFieldsToColumns(viewId, view?.fields || {})}
+			data={data?.items || []}
+			onClickRow={(item) => {
+				navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
+			}}
+		/>
 	);
 }

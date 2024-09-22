@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
+import { FilterItem } from "melony";
 
 const prismaClientSingleton = () => {
 	return new PrismaClient();
@@ -15,3 +16,49 @@ const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export { prisma };
+
+function isStringNumber(value: string): boolean {
+	return !isNaN(Number(value)) && !isNaN(parseFloat(value));
+}
+
+function convertValue(value: any): any {
+	if (typeof value === "string" && isStringNumber(value)) {
+		return Number(value);
+	}
+	return value;
+}
+
+export function filterToPrismaQuery(filters: FilterItem[]): Prisma.JsonObject {
+	return filters.reduce((acc, filter) => {
+		const { field, operator, value } = filter;
+		const convertedValue = convertValue(value);
+
+		switch (operator) {
+			case "Is":
+				acc[field] = { equals: convertedValue };
+				break;
+			case "Contains":
+				acc[field] = { contains: convertedValue, mode: "insensitive" };
+				break;
+			case "DoesNotContain":
+				acc[field] = { not: { contains: convertedValue, mode: "insensitive" } };
+				break;
+			case "IsAnyOf":
+				acc[field] = {
+					in: Array.isArray(value) ? value.map(convertValue) : [convertedValue],
+				};
+				break;
+			case "GeoWithinBox":
+				// Assuming value is an object with minLat, maxLat, minLng, maxLng
+				acc[field] = {
+					gte: [convertValue(value.minLng), convertValue(value.minLat)],
+					lte: [convertValue(value.maxLng), convertValue(value.maxLat)],
+				};
+				break;
+			default:
+				throw new Error(`Unsupported operator: ${operator}`);
+		}
+
+		return acc;
+	}, {} as Prisma.JsonObject);
+}

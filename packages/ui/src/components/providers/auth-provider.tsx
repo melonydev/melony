@@ -22,8 +22,7 @@ export const AuthContext = createContext<{
 export function AuthProvider({ children }: AuthProviderProps) {
 	const { config } = useApp();
 
-	const authResource = config?.resources?.["auth"];
-	const authResourceActions = authResource?.actions || {};
+	const authResourceActions: any = {};
 
 	const meAction = authResourceActions["me"];
 	const loginAction = authResourceActions["login"];
