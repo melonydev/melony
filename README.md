@@ -4,6 +4,8 @@
 
 Melony is a powerful and flexible admin panel generator designed exclusively for Next.js applications. It empowers backend developers to create sophisticated, beautiful, and consistent internal tools without writing a single line of frontend code. By leveraging Next.js's server-side capabilities, Melony allows you to define your entire admin interface using simple JavaScript objects, transforming your data models and business logic into a fully-functional, visually appealing admin panel.
 
+![melony](https://melony.dev/_next/static/media/screen_sm.1bd0bc98.jpg)
+
 ## Key Features
 
 - **Next.js Optimized**: Built from the ground up for Next.js, utilizing its API routes and server-side rendering capabilities.
