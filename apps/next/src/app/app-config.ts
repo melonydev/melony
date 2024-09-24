@@ -7,7 +7,7 @@ import * as projectViews from "./(melony)/views/projects";
 import * as projectStatusesViews from "./(melony)/views/project-statuses";
 
 export const appConfig: AppConfig = {
-	title: "Saamkroshii",
+	title: "SimpleCRM",
 	views: {
 		auth: authResource,
 		projectStatusResource,
