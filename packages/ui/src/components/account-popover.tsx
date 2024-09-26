@@ -10,11 +10,22 @@ import {
 } from "./ui/dropdown-menu";
 import { useAuth } from "./providers/auth-provider";
 import { stringToColor } from "@/lib/string-to-color";
+import { Button } from "./ui/button";
 
 export function AccountPopover() {
-	const { user, logout } = useAuth();
+	const { user, logout, login } = useAuth();
 
-	if (!user) return null;
+	if (!user && !!login)
+		return (
+			<Button
+				variant="ghost"
+				onClick={() => {
+					login({});
+				}}
+			>
+				Login
+			</Button>
+		);
 
 	return (
 		<div className="flex flex-col gap-1">

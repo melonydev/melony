@@ -14,9 +14,11 @@ import { RelationshipField } from "@melony/types";
 export function FormCombobox({
 	fieldKey,
 	field,
+	simple,
 }: {
 	fieldKey: string;
 	field: RelationshipField;
+	simple?: boolean;
 }) {
 	const { control } = useFormContext();
 
@@ -35,7 +37,7 @@ export function FormCombobox({
 			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || fieldKey}</FormLabel>
+					{!simple && <FormLabel>{field?.label || fieldKey}</FormLabel>}
 					<FormControl>
 						<Combobox
 							options={data}

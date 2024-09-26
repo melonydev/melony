@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Filter, Trash } from "lucide-react";
-import { Field, FilterItem, Model, Resource } from "@melony/types";
+import { Field, FilterItem } from "@melony/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import {
@@ -13,19 +13,27 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "./ui/select";
-import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
+import { DEFAULT_COMPONENTS_MAP } from "@/constants";
+import { Form } from "./ui/form";
+import { useForm } from "react-hook-form";
 
-export const convertFieldsToFilterTokens = (fields: Field[]) => {
+export const convertFieldsToFilterTokens = (fields: Record<string, Field>) => {
 	const filterTokens: FilterTokenProps[] = [];
 
-	fields.map((field) => {
-		if (["text", "checkbox", "number"].includes(field.type || "")) {
+	Object.keys(fields).map((fieldKey) => {
+		const field = fields[fieldKey];
+
+		if (!field) return;
+
+		if (
+			["text", "checkbox", "number", "relationship"].includes(field.type || "")
+		) {
 			filterTokens.push({
-				defaultOperator: "Contains",
+				defaultOperator: "Is",
 				availableOperators: ["Is", "Contains", "DoesNotContain", "IsAnyOf"],
 				// TODO: how to define Field type to have it in core and ui packages
-				field,
+				field: { ...field, key: fieldKey },
 			});
 		}
 	});
@@ -38,7 +46,7 @@ export type FilterTokenProps = {
 	isDefault?: boolean;
 	defaultOperator?: FilterItem["operator"];
 	availableOperators?: FilterItem["operator"][];
-	field: Field;
+	field: Field & { key: string };
 };
 
 export type AdvancedFilterProps = {
@@ -49,63 +57,69 @@ export type AdvancedFilterProps = {
 };
 
 export function AdvancedFilter({
-	resource,
-	values,
+	fields,
+	initialValues,
 	onChange,
 }: {
-	resource: Resource;
-	values: FilterItem[];
+	fields: Record<string, Field>;
+	initialValues: FilterItem[];
 	onChange: (filter: FilterItem[]) => void;
 }) {
 	const [open, setOpen] = React.useState(false);
 
-	const filterTokens = convertFieldsToFilterTokens(resource?.fields || []);
+	const [localValues, setLocalValues] = React.useState(initialValues);
+
+	const filterTokens = convertFieldsToFilterTokens(fields);
 
 	const defaultField =
 		filterTokens.find((field) => field.isDefault) || filterTokens[0];
 
 	const handleAddFilter = () => {
-		const newValues = [...values];
+		const newValues = [...localValues];
 		newValues.push({
-			field: defaultField?.field?.path || "",
-			operator: defaultField?.defaultOperator || "Contains",
+			field: defaultField?.field?.key || "",
+			operator: defaultField?.defaultOperator || "Is",
 			value: "",
 		});
-		onChange(newValues);
+		setLocalValues(newValues);
 	};
 
 	const handleFilterChange = (idx: number, value: FilterItem) => {
-		const newValues = [...values];
+		const newValues = [...localValues];
 		newValues[idx] = value;
-		onChange([...newValues]);
+		setLocalValues([...newValues]);
 	};
 
 	const handleRemoveItem = (idx: number) => {
-		const newValues = [...values];
+		const newValues = [...localValues];
 		newValues.splice(idx, 1);
-		onChange(newValues);
+		setLocalValues(newValues);
+	};
+
+	const handleApply = () => {
+		onChange(localValues);
 	};
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="outline">
-					<Filter className="h-4 w-4 mr-2" />
+					{/* <Filter className="h-4 w-4 mr-2" /> */}
 					Filter{" "}
-					{values.length > 0 && (
+					{initialValues.length > 0 && (
 						<Badge className="ml-2" variant="secondary">
-							{values.length}
+							{initialValues.length}
 						</Badge>
 					)}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[400px] p-0" align="start">
-				{values.length === 0 && (
+			<PopoverContent className="min-w-[400px] w-auto p-0" align="start">
+				{localValues.length === 0 && (
 					<p className="text-sm text-foreground p-4">No filters are applied.</p>
 				)}
 
 				<div className="space-y-2 p-4">
-					{values.map((item, i) => (
+					{localValues.map((item, i) => (
 						<AdvancedFilterItem
 							key={i}
 							filterTokens={filterTokens}
@@ -120,9 +134,15 @@ export function AdvancedFilter({
 					))}
 				</div>
 
-				<div className="p-3">
-					<Button onClick={handleAddFilter} variant="outline" size="sm">
+				<div className="p-3 flex gap-2 justify-between">
+					<Button onClick={handleAddFilter} variant="outline">
 						Add filter
+					</Button>
+					<Button
+						onClick={handleApply}
+						disabled={initialValues.length === 0 && localValues.length === 0}
+					>
+						Apply
 					</Button>
 				</div>
 			</PopoverContent>
@@ -143,9 +163,18 @@ type FilterItemProps = {
 export function AdvancedFilterItem(props: FilterItemProps) {
 	const { onChange, filterTokens, onRemove, value } = props;
 
+	const timeoutRef = React.useRef<number | null>(null);
+
+	const form = useForm<any>({
+		// resolver: zodResolver(formSchema),
+		defaultValues: {
+			[value.field]: value.value,
+		},
+	});
+
 	const splittedField = value.field.split("."); // if there is like task.id split and use just a task
 	const currentField = filterTokens.find(
-		(x) => x.field.path === splittedField[0],
+		(x) => x.field.key === splittedField[0],
 	);
 
 	const handleChangeField = (field: string) => {
@@ -178,68 +207,94 @@ export function AdvancedFilterItem(props: FilterItemProps) {
 		});
 	};
 
+	React.useEffect(() => {
+		const subscription = form.watch((value, { name, type }) => {
+			if (type === "change") {
+				form.handleSubmit(onSubmit)();
+			}
+		});
+
+		return () => {
+			subscription.unsubscribe();
+		};
+	}, [form, onSubmit]);
+
+	let Comp =
+		currentField?.field?.components?.form ||
+		DEFAULT_COMPONENTS_MAP[currentField?.field?.type || "text"].form;
+
+	function onSubmit(data?: any) {
+		const key = (Object.keys(data)?.[0] || "") as string;
+		const value = data[key];
+
+		handleValueChange(key, value);
+	}
+
 	return (
-		<div className="flex items-center gap-2 mb-2">
-			<div className="w-36">
-				<Select
-					value={currentField?.field.path}
-					onValueChange={(value) => handleChangeField(value)}
-				>
-					<SelectTrigger className="w-full h-10">
-						<SelectValue placeholder="pl" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							{filterTokens.map((token) => {
-								return (
-									<SelectItem key={token.field.path} value={token.field.path}>
-										{token.field?.path || "unknown"}
-									</SelectItem>
-								);
-							})}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
-			</div>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+				<div className="flex items-center gap-2 mb-2">
+					<div className="w-36">
+						<Select
+							value={currentField?.field.key}
+							onValueChange={(value) => handleChangeField(value)}
+						>
+							<SelectTrigger className="w-full h-10">
+								<SelectValue placeholder="pl" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									{filterTokens.map((token) => {
+										return (
+											<SelectItem key={token.field.key} value={token.field.key}>
+												{token.field?.key || "unknown"}
+											</SelectItem>
+										);
+									})}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 
-			<div className="w-24">
-				<Select
-					value={value.operator}
-					onValueChange={(value) =>
-						handleChangeOperator(value as FilterItem["operator"])
-					}
-				>
-					<SelectTrigger className="w-full h-10">
-						<SelectValue placeholder="pl" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							{(currentField?.availableOperators || ["Contains"]).map(
-								(operator) => {
-									return (
-										<SelectItem key={operator} value={operator}>
-											{operator}
-										</SelectItem>
-									);
-								},
-							)}
-						</SelectGroup>
-					</SelectContent>
-				</Select>
-			</div>
+					<div className="w-24">
+						<Select
+							value={value.operator}
+							onValueChange={(value) =>
+								handleChangeOperator(value as FilterItem["operator"])
+							}
+						>
+							<SelectTrigger className="w-full h-10">
+								<SelectValue placeholder="pl" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									{(currentField?.availableOperators || ["Contains"]).map(
+										(operator) => {
+											return (
+												<SelectItem key={operator} value={operator}>
+													{operator}
+												</SelectItem>
+											);
+										},
+									)}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 
-			<div>
-				<Input
-					value={value.value}
-					onChange={(e) => {
-						handleValueChange(value.field, e.target.value);
-					}}
-				/>
-			</div>
+					<div>
+						<Comp
+							fieldKey={currentField?.field?.key}
+							field={currentField?.field}
+							simple
+						/>
+					</div>
 
-			<Button onClick={() => onRemove()} variant="ghost">
-				<Trash className="h-4 w-4" />
-			</Button>
-		</div>
+					<Button onClick={() => onRemove()} variant="ghost">
+						<Trash className="h-4 w-4" />
+					</Button>
+				</div>
+			</form>
+		</Form>
 	);
 }

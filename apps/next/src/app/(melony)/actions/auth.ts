@@ -1,20 +1,20 @@
 "use server";
 
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { DocAction, FormAction, HasAccess } from "melony";
+import { HasAccess, User } from "melony";
 import { redirect } from "next/navigation";
 
 const { getUser } = getKindeServerSession();
 
-export const loginAction: FormAction["execute"] = async () => {
+export const loginAction = async () => {
 	redirect("/api/auth/login");
 };
 
-export const logoutAction: FormAction["execute"] = async () => {
+export const logoutAction = async () => {
 	redirect("/api/auth/logout");
 };
 
-export const meAction: DocAction["execute"] = async () => {
+export const meAction = async (): Promise<User | null> => {
 	const kindeUser = await getUser();
 
 	if (!kindeUser) throw new Error("User not found");

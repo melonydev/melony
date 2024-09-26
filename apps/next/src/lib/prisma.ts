@@ -30,8 +30,12 @@ function convertValue(value: any): any {
 
 export function filterToPrismaQuery(filters: FilterItem[]): Prisma.JsonObject {
 	return filters.reduce((acc, filter) => {
+		console.log("filter", filter);
+
 		const { field, operator, value } = filter;
 		const convertedValue = convertValue(value);
+
+		if (!value) return acc;
 
 		switch (operator) {
 			case "Is":

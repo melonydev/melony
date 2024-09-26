@@ -40,6 +40,7 @@ const fields: Record<string, Field> = {
 		getSuggestions: getProjectStatusSuggestions,
 		valueAsNumber: true,
 		displayField: "status",
+		filterable: true,
 	},
 };
 

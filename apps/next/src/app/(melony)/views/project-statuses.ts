@@ -18,7 +18,6 @@ export const projectStatusesListView: View = {
 	title: "Project Statuses",
 	fields,
 	action: listProjectStatusesAction,
-	showInNavigation: true,
 	onItemClick: { viewId: "projectStatusDetailedView" },
 };
 

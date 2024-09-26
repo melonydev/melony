@@ -17,6 +17,7 @@ export type BaseField = {
 		form: any;
 	};
 	hasAccess?: HasAccess;
+	filterable?: boolean;
 };
 
 export type TextField = BaseField & {

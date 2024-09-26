@@ -1,10 +1,18 @@
-import { BaseContext, Field, ListView as ListViewTD } from "@melony/types";
+import {
+	BaseContext,
+	Field,
+	FilterItem,
+	ListView as ListViewTD,
+} from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "../data-table";
 import { useApp } from "../providers/app-provider";
 import { ColumnDef } from "@tanstack/react-table";
 import { DEFAULT_COMPONENTS_MAP } from "@/constants";
 import { ActionsDropdownMenu } from "../actions/actions-dropdown-menu";
+import { HeaderButtons } from "../actions/header-buttons";
+import { AdvancedFilter } from "../advanced-filter";
+import React from "react";
 
 const convertFieldsToColumns = (
 	viewId: string,
@@ -56,23 +64,46 @@ export function ListView({
 }) {
 	const { navigate, config } = useApp();
 
+	const [filterValues, setFilterValues] = React.useState<FilterItem[]>([]);
+
 	const view = config?.views?.[viewId] as ListViewTD;
+	const fields = view?.fields || {};
+
+	const filterableFilters = Object.fromEntries(
+		Object.entries(fields).filter(([_, field]) => field.filterable),
+	);
 
 	const { data, isLoading } = useQuery({
-		queryKey: [viewId, ctx],
-		queryFn: () => view?.action({ filter: ctx?.initialFilter || [] }),
+		queryKey: [viewId, ctx, filterValues],
+		queryFn: () =>
+			view?.action({
+				filter: [...(ctx?.initialFilter || []), ...filterValues],
+			}),
 	});
 
 	if (!view) return null;
 
 	return (
-		<DataTable<any, any>
-			isLoading={isLoading}
-			columns={convertFieldsToColumns(viewId, view?.fields || {})}
-			data={data?.items || []}
-			onClickRow={(item) => {
-				navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
-			}}
-		/>
+		<div className="flex flex-col h-full">
+			<div className="py-1 px-3 flex items-center gap-2">
+				<HeaderButtons viewId={viewId} />
+				<AdvancedFilter
+					fields={filterableFilters}
+					initialValues={filterValues}
+					onChange={setFilterValues}
+				/>
+			</div>
+
+			<div className="flex-1">
+				<DataTable<any, any>
+					isLoading={isLoading}
+					columns={convertFieldsToColumns(viewId, fields)}
+					data={data?.items || []}
+					onClickRow={(item) => {
+						navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
+					}}
+				/>
+			</div>
+		</div>
 	);
 }

@@ -22,27 +22,27 @@ export const AuthContext = createContext<{
 export function AuthProvider({ children }: AuthProviderProps) {
 	const { config } = useApp();
 
-	const authResourceActions: any = {};
+	const authConfig = config?.auth || {};
 
-	const meAction = authResourceActions["me"];
-	const loginAction = authResourceActions["login"];
-	const logoutAction = authResourceActions["logout"];
+	const meAction = authConfig?.["meAction"];
+	const loginAction = authConfig?.["loginAction"];
+	const logoutAction = authConfig?.["logoutAction"];
 
 	const { data: user, isLoading } = useQuery({
 		queryKey: ["me"],
-		queryFn: () => meAction && meAction.execute({}),
+		queryFn: () => meAction && meAction(),
 		refetchOnWindowFocus: false,
 		retry: 0,
 	});
 
 	const { mutate: login } = useMutation<any, any, any>({
 		mutationKey: ["login"],
-		mutationFn: loginAction?.execute,
+		mutationFn: loginAction,
 	});
 
 	const { mutate: logout } = useMutation<any, any, any>({
 		mutationKey: ["logout"],
-		mutationFn: logoutAction?.execute,
+		mutationFn: logoutAction,
 	});
 
 	if (isLoading)

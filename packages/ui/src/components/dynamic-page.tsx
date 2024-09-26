@@ -1,7 +1,6 @@
 import { HomeView } from "./views/home-view";
 import { useApp } from "./providers/app-provider";
 import { Page, PageBody, PageHeader } from "./page";
-import { HeaderButtons } from "./actions/header-buttons";
 import { ViewRenderer } from "./view-renderer";
 
 export function DynamicPage(props: any) {
@@ -32,7 +31,6 @@ export function DynamicPage(props: any) {
 			<PageHeader
 				title={`${view?.title || viewId} • List`}
 				description={view?.description}
-				actions={<HeaderButtons viewId={viewId} />}
 			/>
 
 			<PageBody>{renderView()}</PageBody>

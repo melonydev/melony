@@ -18,7 +18,7 @@ export const SmartBadge = ({
 				</Avatar>
 			)}
 
-			<Badge variant="secondary" color={color}>
+			<div>
 				<div className="flex items-center">
 					{color && (
 						<div
@@ -28,7 +28,7 @@ export const SmartBadge = ({
 					)}
 					<span className="block truncate">{title}</span>
 				</div>
-			</Badge>
+			</div>
 		</div>
 	);
 };

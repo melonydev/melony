@@ -1,3 +1,4 @@
+import { Auth } from "./auth";
 import { FilterItem } from "./filters";
 import { UI } from "./ui";
 import { View } from "./views";
@@ -5,6 +6,7 @@ import { View } from "./views";
 export type AppConfig = {
 	title: string;
 	ui?: UI;
+	auth?: Auth;
 	views?: Record<string, View>;
 };
 
