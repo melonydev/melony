@@ -18,13 +18,13 @@ export type BaseView = {
 // LIST VIEW
 export type ListViewResponse = {
 	items: any;
-	meta?: any;
+	meta?: { total: number };
 };
 export type ListViewParams = {
 	q?: string;
 	filter?: FilterItem[];
 	sort?: any;
-	paginate?: any;
+	paginate?: { pageIndex: number; pageSize: number };
 };
 export type ListView = BaseView & {
 	type: "list";

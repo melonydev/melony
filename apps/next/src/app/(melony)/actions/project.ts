@@ -4,21 +4,35 @@ import { filterToPrismaQuery, prisma } from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { DetailView, FormView, ListView } from "melony";
 
-export const listProjectsAction: ListView["action"] = async ({ filter }) => {
+export const listProjectsAction: ListView["action"] = async ({
+	filter,
+	paginate,
+}) => {
 	const { isAuthenticated } = getKindeServerSession();
 
 	if (!(await isAuthenticated())) {
-		return { items: [], meta: {} };
+		return { items: [], meta: { total: 0 } };
 	}
 
 	const where = filterToPrismaQuery(filter || []);
+	const take = paginate?.pageSize || 10;
+	const skip = take * (paginate?.pageIndex || 0);
 
 	const res = await prisma.project.findMany({
 		include: { customer: true, owner: true, status: true },
 		where,
+		take,
+		skip,
 	});
 
-	return { items: res, meta: {} };
+	return {
+		items: res,
+		meta: {
+			total: await prisma.project.count({
+				where,
+			}),
+		},
+	};
 };
 
 export const getOneProjectAction: DetailView["action"] = async ({ id }) => {

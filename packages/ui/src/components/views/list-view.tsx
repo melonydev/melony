@@ -1,3 +1,4 @@
+import React from "react";
 import {
 	BaseContext,
 	Field,
@@ -7,12 +8,11 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "../data-table";
 import { useApp } from "../providers/app-provider";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { DEFAULT_COMPONENTS_MAP } from "@/constants";
 import { ActionsDropdownMenu } from "../actions/actions-dropdown-menu";
 import { HeaderButtons } from "../actions/header-buttons";
 import { AdvancedFilter } from "../advanced-filter";
-import React from "react";
 
 const convertFieldsToColumns = (
 	viewId: string,
@@ -66,6 +66,25 @@ export function ListView({
 
 	const [filterValues, setFilterValues] = React.useState<FilterItem[]>([]);
 
+	const [{ pageIndex, pageSize }, setPagination] =
+		React.useState<PaginationState>({
+			pageIndex: 0,
+			pageSize: 10,
+		});
+
+	const pagination = React.useMemo(
+		() => ({
+			pageIndex,
+			pageSize,
+		}),
+		[pageIndex, pageSize],
+	);
+
+	const memoizedFilterValues = React.useMemo(
+		() => filterValues,
+		[filterValues],
+	);
+
 	const view = config?.views?.[viewId] as ListViewTD;
 	const fields = view?.fields || {};
 
@@ -74,10 +93,11 @@ export function ListView({
 	);
 
 	const { data, isLoading } = useQuery({
-		queryKey: [viewId, ctx, filterValues],
+		queryKey: [viewId, ctx, memoizedFilterValues, pagination],
 		queryFn: () =>
 			view?.action({
 				filter: [...(ctx?.initialFilter || []), ...filterValues],
+				paginate: pagination,
 			}),
 	});
 
@@ -87,21 +107,27 @@ export function ListView({
 		<div className="flex flex-col h-full">
 			<div className="py-1 px-3 flex items-center gap-2">
 				<HeaderButtons viewId={viewId} />
-				<AdvancedFilter
-					fields={filterableFilters}
-					initialValues={filterValues}
-					onChange={setFilterValues}
-				/>
+
+				{Object.keys(filterableFilters).length > 0 && (
+					<AdvancedFilter
+						fields={filterableFilters}
+						initialValues={filterValues}
+						onChange={setFilterValues}
+					/>
+				)}
 			</div>
 
-			<div className="flex-1">
+			<div className="flex-1 flex flex-col">
 				<DataTable<any, any>
-					isLoading={isLoading}
 					columns={convertFieldsToColumns(viewId, fields)}
 					data={data?.items || []}
+					isLoading={isLoading}
+					pagination={pagination}
+					total={data?.meta?.total || 0}
 					onClickRow={(item) => {
 						navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
 					}}
+					onPaginationChange={setPagination}
 				/>
 			</div>
 		</div>

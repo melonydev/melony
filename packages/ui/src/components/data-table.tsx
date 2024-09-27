@@ -4,6 +4,9 @@ import {
 	ColumnDef,
 	flexRender,
 	getCoreRowModel,
+	getPaginationRowModel,
+	OnChangeFn,
+	PaginationState,
 	useReactTable,
 } from "@tanstack/react-table";
 
@@ -18,6 +21,7 @@ import {
 import { Skeleton } from "./ui/skeleton";
 import React from "react";
 import { cn } from "..";
+import { DataTablePagination } from "./data-table-pagination";
 
 const defaultColumnSizing = {
 	size: 180,
@@ -29,16 +33,22 @@ interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	isLoading?: boolean;
+	pagination: PaginationState;
+	total: number;
 	onClickRow: (data: TData) => void;
 	onSelect?: (old: any) => void;
+	onPaginationChange: OnChangeFn<PaginationState>;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
 	data,
 	isLoading,
+	pagination,
+	total,
 	onClickRow,
 	onSelect,
+	onPaginationChange,
 }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 
@@ -52,8 +62,15 @@ export function DataTable<TData, TValue>({
 		},
 		state: {
 			rowSelection,
+			pagination,
 		},
 		defaultColumn: defaultColumnSizing,
+		pageCount: Math.ceil(total / pagination.pageSize),
+		onPaginationChange,
+		getPaginationRowModel: getPaginationRowModel(),
+		manualPagination: true,
+		manualSorting: true,
+		manualFiltering: true,
 	});
 
 	const renderBody = () => {
@@ -95,35 +112,41 @@ export function DataTable<TData, TValue>({
 	};
 
 	return (
-		<Table>
-			<TableHeader>
-				{table.getHeaderGroups().map((headerGroup) => (
-					<TableRow key={headerGroup.id} className="hover:bg-[transparent]">
-						{headerGroup.headers.map((header, i) => {
-							return (
-								<TableHead
-									key={header.id}
-									className={cn("truncate")}
-									style={{
-										width:
-											i === 1 && header.getSize() === defaultColumnSizing.size
-												? "auto"
-												: header.getSize(),
-									}} // considering that first column is always checkbox and second is always wider because we expect this is a main title if its not equal to default
-								>
-									{header.isPlaceholder
-										? null
-										: flexRender(
-												header.column.columnDef.header,
-												header.getContext(),
-											)}
-								</TableHead>
-							);
-						})}
-					</TableRow>
-				))}
-			</TableHeader>
-			<TableBody>{renderBody()}</TableBody>
-		</Table>
+		<div className="flex flex-col flex-1">
+			<Table>
+				<TableHeader>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id} className="hover:bg-[transparent]">
+							{headerGroup.headers.map((header, i) => {
+								return (
+									<TableHead
+										key={header.id}
+										className={cn("truncate")}
+										style={{
+											width:
+												i === 1 && header.getSize() === defaultColumnSizing.size
+													? "auto"
+													: header.getSize(),
+										}} // considering that first column is always checkbox and second is always wider because we expect this is a main title if its not equal to default
+									>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef.header,
+													header.getContext(),
+												)}
+									</TableHead>
+								);
+							})}
+						</TableRow>
+					))}
+				</TableHeader>
+				<TableBody>{renderBody()}</TableBody>
+			</Table>
+
+			<div className="py-1 px-3">
+				<DataTablePagination table={table} />
+			</div>
+		</div>
 	);
 }

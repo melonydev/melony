@@ -113,10 +113,10 @@ importers:
   packages/core:
     dependencies:
       '@melony/types':
-        specifier: workspace:*
+        specifier: ^0.0.8
         version: link:../types
       '@melony/ui':
-        specifier: workspace:*
+        specifier: ^0.1.17
         version: link:../ui
       react:
         specifier: 18.3.1
@@ -177,7 +177,7 @@ importers:
         specifier: ^3.3.4
         version: 3.4.2(react-hook-form@7.51.5)
       '@melony/types':
-        specifier: workspace:*
+        specifier: ^0.0.8
         version: link:../types
       '@radix-ui/react-accordion':
         specifier: ^1.1.2

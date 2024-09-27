@@ -59,7 +59,7 @@ export const projectsMiniListView: View = {
 	type: "list",
 	title: "Projects",
 	fields: {
-		title: { label: "Title" },
+		title: { label: "Title", filterable: true },
 		amount: {
 			label: "Amount",
 			description: "Grand amount of the current project.",
@@ -75,6 +75,7 @@ export const projectsMiniListView: View = {
 			getSuggestions: getCustomerSuggestions,
 			valueAsNumber: true,
 			displayField: "customer",
+			filterable: true,
 		},
 		ownerId: {
 			label: "Owner",
