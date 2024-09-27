@@ -41,6 +41,7 @@ const fields: Record<string, Field> = {
 		valueAsNumber: true,
 		displayField: "status",
 		filterable: true,
+		sortable: true,
 	},
 };
 

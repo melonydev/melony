@@ -8,36 +8,76 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "../data-table";
 import { useApp } from "../providers/app-provider";
-import { ColumnDef, PaginationState } from "@tanstack/react-table";
-import { DEFAULT_COMPONENTS_MAP } from "@/constants";
+import {
+	ColumnDef,
+	PaginationState,
+	SortingState,
+} from "@tanstack/react-table";
+import { DEFAULT_COMPONENTS_MAP, DEFAULT_PAGE_SIZE } from "@/constants";
 import { ActionsDropdownMenu } from "../actions/actions-dropdown-menu";
 import { HeaderButtons } from "../actions/header-buttons";
 import { AdvancedFilter } from "../advanced-filter";
+import { Button } from "../ui/button";
+import { ArrowDownIcon, ArrowDownUpIcon, ArrowUpIcon } from "lucide-react";
 
 const convertFieldsToColumns = (
 	viewId: string,
 	fields: Record<string, Field>,
 ) => {
 	const columns: ColumnDef<any, any>[] = Object.keys(fields).map((fieldKey) => {
+		let realFieldKey = fieldKey;
+
 		const field = fields?.[fieldKey] || {
 			type: "text",
 			label: "",
 			components: { form: null },
+			sortable: false,
 		};
 
 		if (field.type === "relationship" && field?.displayField) {
-			fieldKey = field.displayField;
+			realFieldKey = field.displayField;
 		}
 
 		return {
-			header: field?.label || fieldKey,
+			header: ({ column }) => (
+				<div className="flex items-center gap-2 justify-between">
+					{field?.label || realFieldKey}
+
+					{field?.sortable && (
+						<Button
+							onClick={() => column.toggleSorting()}
+							variant="ghost"
+							size="icon"
+						>
+							{column.getIsSorted() === "desc" ? (
+								<ArrowDownIcon
+									className="size-3.5 text-muted-foreground/70"
+									aria-hidden="true"
+								/>
+							) : column.getIsSorted() === "asc" ? (
+								<ArrowUpIcon
+									className="size-3.5 text-muted-foreground/70"
+									aria-hidden="true"
+								/>
+							) : (
+								<ArrowDownUpIcon
+									className="size-3.5 text-muted-foreground/70"
+									aria-hidden="true"
+								/>
+							)}
+						</Button>
+					)}
+				</div>
+			),
 			accessorKey: fieldKey,
 			cell: ({ row }) => {
 				let Comp =
 					field?.components?.form ||
 					DEFAULT_COMPONENTS_MAP[field?.type || "text"].display;
 
-				let value = row.getValue(fieldKey);
+				let value = row.original?.[realFieldKey];
+
+				console.log("value", value);
 
 				return <Comp field={field} value={value} />;
 			},
@@ -69,7 +109,7 @@ export function ListView({
 	const [{ pageIndex, pageSize }, setPagination] =
 		React.useState<PaginationState>({
 			pageIndex: 0,
-			pageSize: 10,
+			pageSize: DEFAULT_PAGE_SIZE,
 		});
 
 	const pagination = React.useMemo(
@@ -79,6 +119,8 @@ export function ListView({
 		}),
 		[pageIndex, pageSize],
 	);
+
+	const [sorting, setSorting] = React.useState<SortingState>([]);
 
 	const memoizedFilterValues = React.useMemo(
 		() => filterValues,
@@ -93,11 +135,12 @@ export function ListView({
 	);
 
 	const { data, isLoading } = useQuery({
-		queryKey: [viewId, ctx, memoizedFilterValues, pagination],
+		queryKey: [viewId, ctx, memoizedFilterValues, pagination, sorting],
 		queryFn: () =>
 			view?.action({
 				filter: [...(ctx?.initialFilter || []), ...filterValues],
 				paginate: pagination,
+				sort: sorting,
 			}),
 	});
 
@@ -123,11 +166,13 @@ export function ListView({
 					data={data?.items || []}
 					isLoading={isLoading}
 					pagination={pagination}
+					sorting={sorting}
 					total={data?.meta?.total || 0}
 					onClickRow={(item) => {
 						navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
 					}}
 					onPaginationChange={setPagination}
+					onSortingChange={setSorting}
 				/>
 			</div>
 		</div>

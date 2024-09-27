@@ -1,12 +1,17 @@
 "use server";
 
-import { filterToPrismaQuery, prisma } from "@/lib/prisma";
+import {
+	convertToPrismaOrderBy,
+	filterToPrismaQuery,
+	prisma,
+} from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { DetailView, FormView, ListView } from "melony";
 
 export const listProjectsAction: ListView["action"] = async ({
 	filter,
 	paginate,
+	sort,
 }) => {
 	const { isAuthenticated } = getKindeServerSession();
 
@@ -17,12 +22,14 @@ export const listProjectsAction: ListView["action"] = async ({
 	const where = filterToPrismaQuery(filter || []);
 	const take = paginate?.pageSize || 10;
 	const skip = take * (paginate?.pageIndex || 0);
+	const orderBy = convertToPrismaOrderBy(sort || []);
 
 	const res = await prisma.project.findMany({
 		include: { customer: true, owner: true, status: true },
 		where,
 		take,
 		skip,
+		orderBy,
 	});
 
 	return {

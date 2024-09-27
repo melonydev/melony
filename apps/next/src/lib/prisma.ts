@@ -64,3 +64,18 @@ export function filterToPrismaQuery(filters: FilterItem[]): Prisma.JsonObject {
 		return acc;
 	}, {} as Prisma.JsonObject);
 }
+
+type InputOrderBy = Array<{ id: string; desc: boolean }>;
+
+// Generic type for any Prisma model's OrderByInput
+type PrismaOrderByInput = {
+	[key: string]: Prisma.SortOrder;
+};
+
+export function convertToPrismaOrderBy<T extends PrismaOrderByInput>(
+	input: InputOrderBy,
+): T[] {
+	return input.map((item) => ({
+		[item.id]: item.desc ? Prisma.SortOrder.desc : Prisma.SortOrder.asc,
+	})) as T[];
+}

@@ -18,6 +18,7 @@ export type BaseField = {
 	};
 	hasAccess?: HasAccess;
 	filterable?: boolean;
+	sortable?: boolean;
 };
 
 export type TextField = BaseField & {

@@ -54,3 +54,5 @@ export const DEFAULT_COMPONENTS_MAP = {
 		form: FormColor,
 	},
 };
+
+export const DEFAULT_PAGE_SIZE = 10;

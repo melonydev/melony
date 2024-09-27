@@ -23,7 +23,10 @@ export type ListViewResponse = {
 export type ListViewParams = {
 	q?: string;
 	filter?: FilterItem[];
-	sort?: any;
+	sort?: {
+		id: string;
+		desc: boolean;
+	}[];
 	paginate?: { pageIndex: number; pageSize: number };
 };
 export type ListView = BaseView & {

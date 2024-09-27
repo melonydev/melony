@@ -5,8 +5,10 @@ import {
 	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
+	getSortedRowModel,
 	OnChangeFn,
 	PaginationState,
+	SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
 
@@ -20,8 +22,9 @@ import {
 } from "./ui/table";
 import { Skeleton } from "./ui/skeleton";
 import React from "react";
-import { cn } from "..";
 import { DataTablePagination } from "./data-table-pagination";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { cn } from "@/lib";
 
 const defaultColumnSizing = {
 	size: 180,
@@ -33,11 +36,13 @@ interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	isLoading?: boolean;
-	pagination: PaginationState;
+	pagination?: PaginationState;
+	sorting?: SortingState;
 	total: number;
 	onClickRow: (data: TData) => void;
 	onSelect?: (old: any) => void;
-	onPaginationChange: OnChangeFn<PaginationState>;
+	onPaginationChange?: OnChangeFn<PaginationState>;
+	onSortingChange?: OnChangeFn<SortingState>;
 }
 
 export function DataTable<TData, TValue>({
@@ -45,10 +50,12 @@ export function DataTable<TData, TValue>({
 	data,
 	isLoading,
 	pagination,
+	sorting,
 	total,
 	onClickRow,
 	onSelect,
 	onPaginationChange,
+	onSortingChange,
 }: DataTableProps<TData, TValue>) {
 	const [rowSelection, setRowSelection] = React.useState({});
 
@@ -63,11 +70,14 @@ export function DataTable<TData, TValue>({
 		state: {
 			rowSelection,
 			pagination,
+			sorting,
 		},
 		defaultColumn: defaultColumnSizing,
-		pageCount: Math.ceil(total / pagination.pageSize),
+		pageCount: Math.ceil(total / (pagination?.pageSize || DEFAULT_PAGE_SIZE)),
 		onPaginationChange,
+		onSortingChange,
 		getPaginationRowModel: getPaginationRowModel(),
+		getSortedRowModel: getSortedRowModel(),
 		manualPagination: true,
 		manualSorting: true,
 		manualFiltering: true,
