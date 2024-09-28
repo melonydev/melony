@@ -40,10 +40,10 @@ export function filterToPrismaQuery(filters: FilterItem[]): Prisma.JsonObject {
 				acc[field] = { equals: convertedValue };
 				break;
 			case "Contains":
-				acc[field] = { contains: convertedValue, mode: "insensitive" };
+				acc[field] = { contains: convertedValue };
 				break;
 			case "DoesNotContain":
-				acc[field] = { not: { contains: convertedValue, mode: "insensitive" } };
+				acc[field] = { not: { contains: convertedValue } };
 				break;
 			case "IsAnyOf":
 				acc[field] = {

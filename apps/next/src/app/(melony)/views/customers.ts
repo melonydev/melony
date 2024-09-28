@@ -2,6 +2,7 @@ import { Field, View } from "melony";
 import { getCustomersAction } from "../actions/customer";
 
 const fields: Record<string, Field> = {
+	id: { label: "ID" },
 	title: { label: "Title" },
 };
 

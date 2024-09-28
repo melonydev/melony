@@ -13,9 +13,11 @@ import { TextField } from "@melony/types";
 export function FormText({
 	fieldKey,
 	field,
+	simple,
 }: {
 	fieldKey: string;
 	field: TextField;
+	simple?: boolean;
 }) {
 	const { control } = useFormContext();
 
@@ -26,7 +28,7 @@ export function FormText({
 			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || fieldKey}</FormLabel>
+					{!simple && <FormLabel>{field?.label || fieldKey}</FormLabel>}
 					<FormControl>
 						<Input {...rhfField} disabled={field?.isReadOnly} />
 					</FormControl>

@@ -14,10 +14,13 @@ export function HeaderButtons({
 	const id = ctx?.searchParams?.id;
 
 	const view = config?.views?.[viewId] as ListView;
+	const headerButtons = view?.headerButtons || [];
+
+	if (headerButtons.length === 0) return null;
 
 	return (
 		<div className="flex items-center gap-1">
-			{(view?.headerButtons || []).map((buttonElement) => {
+			{headerButtons.map((buttonElement) => {
 				return (
 					<Button
 						key={buttonElement.viewId}

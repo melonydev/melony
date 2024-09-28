@@ -86,3 +86,12 @@ export const sendProjectEmailAction: FormView["action"] = async ({
 
 	return { type: "notify", message: "Success" };
 };
+
+export const getProjectsSuggestions = async () => {
+	const res = await prisma.project.findMany();
+
+	return res.map((item) => ({
+		label: item.title,
+		value: `${item.id}`,
+	}));
+};

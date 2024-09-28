@@ -68,7 +68,7 @@ export function FormView({
 	const fields = view?.fields || {};
 
 	return (
-		<div className="container mx-auto max-w-5xl py-8">
+		<div className="p-8">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
 					<FormFields fields={fields} />

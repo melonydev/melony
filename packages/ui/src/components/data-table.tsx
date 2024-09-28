@@ -154,7 +154,7 @@ export function DataTable<TData, TValue>({
 				<TableBody>{renderBody()}</TableBody>
 			</Table>
 
-			<div className="py-1 px-3">
+			<div className="p-3">
 				<DataTablePagination table={table} />
 			</div>
 		</div>

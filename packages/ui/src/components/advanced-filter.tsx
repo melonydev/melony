@@ -27,7 +27,9 @@ export const convertFieldsToFilterTokens = (fields: Record<string, Field>) => {
 		if (!field) return;
 
 		if (
-			["text", "checkbox", "number", "relationship"].includes(field.type || "")
+			["text", "checkbox", "number", "relationship"].includes(
+				field?.type || "text",
+			)
 		) {
 			filterTokens.push({
 				defaultOperator: "Is",
@@ -290,7 +292,7 @@ export function AdvancedFilterItem(props: FilterItemProps) {
 						/>
 					</div>
 
-					<Button onClick={() => onRemove()} variant="ghost">
+					<Button type="button" onClick={() => onRemove()} variant="ghost">
 						<Trash className="h-4 w-4" />
 					</Button>
 				</div>

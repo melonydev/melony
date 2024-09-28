@@ -77,8 +77,6 @@ const convertFieldsToColumns = (
 
 				let value = row.original?.[realFieldKey];
 
-				console.log("value", value);
-
 				return <Comp field={field} value={value} />;
 			},
 		};
@@ -148,7 +146,7 @@ export function ListView({
 
 	return (
 		<div className="flex flex-col h-full">
-			<div className="py-1 px-3 flex items-center gap-2">
+			<div className="p-3 flex items-center gap-2">
 				<HeaderButtons viewId={viewId} />
 
 				{Object.keys(filterableFilters).length > 0 && (

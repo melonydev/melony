@@ -10,7 +10,7 @@ import { getUserSuggestions } from "../actions/user";
 import { getProjectStatusSuggestions } from "../actions/project-status";
 
 const fields: Record<string, Field> = {
-	title: { label: "Title" },
+	title: { label: "Title", filterable: true },
 	amount: {
 		label: "Amount",
 		description: "Grand amount of the current project.",
@@ -26,6 +26,7 @@ const fields: Record<string, Field> = {
 		getSuggestions: getCustomerSuggestions,
 		valueAsNumber: true,
 		displayField: "customer",
+		filterable: true,
 	},
 	ownerId: {
 		label: "Owner",
@@ -33,6 +34,7 @@ const fields: Record<string, Field> = {
 		getSuggestions: getUserSuggestions,
 		valueAsNumber: true,
 		displayField: "owner",
+		filterable: true,
 	},
 	statusId: {
 		label: "Status",
@@ -60,7 +62,7 @@ export const projectsMiniListView: View = {
 	type: "list",
 	title: "Projects",
 	fields: {
-		title: { label: "Title", filterable: true },
+		title: { label: "Title" },
 		amount: {
 			label: "Amount",
 			description: "Grand amount of the current project.",
@@ -76,7 +78,6 @@ export const projectsMiniListView: View = {
 			getSuggestions: getCustomerSuggestions,
 			valueAsNumber: true,
 			displayField: "customer",
-			filterable: true,
 		},
 		ownerId: {
 			label: "Owner",
@@ -119,4 +120,23 @@ export const projectDetailedView: View = {
 	fields: fields,
 	action: getOneProjectAction,
 	headerButtons: [{ label: "Edit", viewId: "projectEditView" }],
+	tabs: [
+		{
+			label: "Tasks",
+			viewId: "tasksListView",
+			setContext: async ({ searchParams }) => {
+				"use server";
+
+				return {
+					initialFilter: [
+						{
+							field: "projectId",
+							operator: "Is",
+							value: searchParams?.id,
+						},
+					],
+				};
+			},
+		},
+	],
 };

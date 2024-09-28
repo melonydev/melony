@@ -35,9 +35,11 @@ export function DetailView({
 	if (!id) return <>ID required</>;
 
 	return (
-		<div className="container mx-auto max-w-5xl py-8">
+		<div className="p-8">
 			<div className="flex flex-col gap-8">
-				<div className="flex flex-col gap-4">
+				<HeaderButtons viewId={viewId} ctx={ctx} />
+
+				<div className="flex flex-col divide-y border rounded-md px-4">
 					{Object.keys(fields).map((fieldKey) => {
 						const field = fields[fieldKey];
 
@@ -54,7 +56,10 @@ export function DetailView({
 						const value = data?.[fieldKey];
 
 						return (
-							<div key={fieldKey} className="grid grid-cols-12 items-center">
+							<div
+								key={fieldKey}
+								className="grid grid-cols-12 items-center py-2"
+							>
 								<div className="col-span-3">
 									<Label>{field?.label || fieldKey}</Label>
 								</div>
@@ -68,7 +73,10 @@ export function DetailView({
 				</div>
 
 				{view?.tabs && (
-					<Tabs defaultValue={view.tabs[0]?.viewId} className="w-full">
+					<Tabs
+						defaultValue={view.tabs[0]?.viewId}
+						className="w-full rounded-md border"
+					>
 						<TabsList>
 							{view.tabs.map((tabElement) => (
 								<TabsTrigger key={tabElement.viewId} value={tabElement.viewId}>
@@ -79,9 +87,6 @@ export function DetailView({
 
 						{view.tabs.map((tabElement) => (
 							<TabsContent key={tabElement.viewId} value={tabElement.viewId}>
-								<div className="py-2 flex justify-end">
-									<HeaderButtons viewId={tabElement.viewId} ctx={{ ...ctx }} />
-								</div>
 								<ViewRenderer
 									viewId={tabElement.viewId}
 									ctx={{ ...ctx }}
