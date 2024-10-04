@@ -8,7 +8,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import { ActionsDropdownMenuItem } from "./actions-dropdown-menu-item";
 import { useApp } from "../providers/app-provider";
-import { ListView } from "@melony/types";
+import { ListViewProps } from "@melony/types";
 
 export function ActionsDropdownMenu({
 	viewId,
@@ -19,7 +19,7 @@ export function ActionsDropdownMenu({
 }) {
 	const { navigate, config } = useApp();
 
-	const view = config?.views?.[viewId] as ListView;
+	const view = config?.views?.[viewId] as ListViewProps;
 
 	return (
 		<DropdownMenu>

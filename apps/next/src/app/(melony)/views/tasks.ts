@@ -1,9 +1,9 @@
-import { Field, ListView } from "melony";
-import { getTasksList } from "../actions/task";
+import { defineView, Field } from "melony";
+import { getOneTask, getTasksList } from "../actions/task";
 import { getProjectsSuggestions } from "../actions/project";
 
 const fields: Record<string, Field> = {
-	title: { label: "Title" },
+	title: { label: "Title", filterable: true },
 	projectId: {
 		label: "Project",
 		type: "relationship",
@@ -35,11 +35,23 @@ const fields: Record<string, Field> = {
 	},
 };
 
-export const tasksListView: ListView = {
-	type: "list",
-	title: "Tasks",
-	fields: fields,
-	action: getTasksList,
-	headerButtons: [{ label: "Create Task", viewId: "taskCreateView" }],
-	showInNavigation: true,
-};
+export const tasksListView = defineView(
+	"list",
+	{
+		title: "Tasks",
+		fields: fields,
+		headerButtons: [{ label: "Create Task", viewId: "taskCreateView" }],
+		showInNavigation: true,
+		onItemClick: { viewId: "taskDetailedView" },
+	},
+	getTasksList,
+);
+
+export const taskDetailedView = defineView(
+	"detail",
+	{
+		title: "Task Details",
+		fields: fields,
+	},
+	getOneTask,
+);

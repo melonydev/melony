@@ -6,9 +6,9 @@ import {
 	prisma,
 } from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { DetailView, DetailViewParams, ListView } from "melony";
+import { DetailViewAction, ListViewAction } from "melony";
 
-export const getTasksList: ListView["action"] = async ({
+export const getTasksList: ListViewAction = async ({
 	filter,
 	paginate,
 	sort,
@@ -34,11 +34,10 @@ export const getTasksList: ListView["action"] = async ({
 	return { items: res };
 };
 
-export const getOneTask: DetailView["action"] = async ({
-	id,
-}: DetailViewParams) => {
+export const getOneTask: DetailViewAction = async ({ id }) => {
 	return (
 		(await prisma.task.findUnique({
+			include: { project: true, item: true, status: true, owner: true },
 			where: { id: Number(id) },
 		})) || {}
 	);

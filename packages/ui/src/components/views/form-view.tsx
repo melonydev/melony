@@ -1,4 +1,4 @@
-import { BaseContext, FormView as FormViewTD } from "@melony/types";
+import { BaseContext, FormViewProps } from "@melony/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Form } from "../ui/form";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,7 @@ export function FormView({
 
 	const id = ctx?.searchParams?.id;
 
-	const view = config?.views?.[viewId] as FormViewTD;
+	const view = config?.views?.[viewId] as FormViewProps;
 
 	const { data: getDefaultValues, isLoading } = useQuery({
 		queryKey: [viewId, "getDefaultValues", id],
@@ -69,15 +69,19 @@ export function FormView({
 
 	return (
 		<div className="p-8">
-			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-					<FormFields fields={fields} />
+			<div className="grid grid-cols-12">
+				<div className="col-span-8">
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+							<FormFields fields={fields} />
 
-					<Button type="submit" disabled={isPending}>
-						{isPending ? "Executing..." : "Execute"}
-					</Button>
-				</form>
-			</Form>
+							<Button type="submit" disabled={isPending}>
+								{isPending ? "Executing..." : "Execute"}
+							</Button>
+						</form>
+					</Form>
+				</div>
+			</div>
 		</div>
 	);
 }

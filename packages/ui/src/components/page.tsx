@@ -2,7 +2,7 @@ import React from "react";
 
 export function Page({ children }: { children: React.ReactNode }) {
 	return (
-		<div id="page" className="h-full flex flex-col rounded-md border shadow">
+		<div id="page" className="h-full flex flex-col rounded-md">
 			{children}
 		</div>
 	);
@@ -18,7 +18,7 @@ export const PageHeader = ({
 	actions?: JSX.Element | JSX.Element[];
 }) => {
 	return (
-		<div className="h-[49px] py-1 px-4">
+		<div className="h-[49px] py-1 px-3">
 			<div className="h-full flex items-center justify-between">
 				<div className="flex flex-col">
 					<div className="font-semibold">{title}</div>

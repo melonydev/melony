@@ -25,6 +25,7 @@ export function HomeView({
 						const view = views[viewId];
 
 						if (!view) return null;
+						if (!view?.showInNavigation) return null;
 
 						return (
 							<div key={viewId}>

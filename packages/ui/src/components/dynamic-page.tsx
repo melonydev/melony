@@ -17,23 +17,28 @@ export function DynamicPage(props: any) {
 
 	const view = views[viewId];
 
-	const renderView = () => {
-		// show home page if no resourceId
-		if (!viewId) {
-			return <HomeView views={views} ctx={{ searchParams }} />;
-		}
+	if (!viewId) {
+		return (
+			<Page>
+				<PageHeader title={"Home"} />
 
-		return <ViewRenderer viewId={viewId} ctx={{ searchParams }} />;
-	};
+				<PageBody>
+					<HomeView views={views} ctx={{ searchParams }} />
+				</PageBody>
+			</Page>
+		);
+	}
 
 	return (
 		<Page>
 			<PageHeader
-				title={`${view?.title || viewId} • List`}
+				title={`${view?.title || viewId}`}
 				description={view?.description}
 			/>
 
-			<PageBody>{renderView()}</PageBody>
+			<PageBody>
+				<ViewRenderer viewId={viewId} ctx={{ searchParams }} />
+			</PageBody>
 		</Page>
 	);
 }

@@ -6,9 +6,9 @@ import {
 	prisma,
 } from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { DetailView, FormView, ListView } from "melony";
+import { DetailViewAction, FormViewAction, ListViewAction } from "melony";
 
-export const listProjectsAction: ListView["action"] = async ({
+export const listProjectsAction: ListViewAction = async ({
 	filter,
 	paginate,
 	sort,
@@ -42,7 +42,7 @@ export const listProjectsAction: ListView["action"] = async ({
 	};
 };
 
-export const getOneProjectAction: DetailView["action"] = async ({ id }) => {
+export const getOneProjectAction: DetailViewAction = async ({ id }) => {
 	const doc = await prisma.project.findUnique({
 		where: { id: Number(id) },
 		include: { customer: true, owner: true, status: true },
@@ -51,7 +51,7 @@ export const getOneProjectAction: DetailView["action"] = async ({ id }) => {
 	return doc || {};
 };
 
-export const createProjectAction: FormView["action"] = async ({ data }) => {
+export const createProjectAction: FormViewAction = async ({ data }) => {
 	await prisma.project.create({
 		data,
 	});
@@ -59,7 +59,7 @@ export const createProjectAction: FormView["action"] = async ({ data }) => {
 	return { type: "notify", message: "Success" };
 };
 
-export const updateProjectAction: FormView["action"] = async ({ id, data }) => {
+export const updateProjectAction: FormViewAction = async ({ id, data }) => {
 	await prisma.project.update({
 		where: { id: Number(id) },
 		data,
@@ -68,7 +68,7 @@ export const updateProjectAction: FormView["action"] = async ({ id, data }) => {
 	return { type: "notify", message: "Success" };
 };
 
-export const deleteProjectAction: FormView["action"] = async ({ id }) => {
+export const deleteProjectAction: FormViewAction = async ({ id }) => {
 	await prisma.project.delete({
 		where: { id: Number(id) },
 	});
@@ -76,10 +76,7 @@ export const deleteProjectAction: FormView["action"] = async ({ id }) => {
 	return { type: "notify", message: "Success" };
 };
 
-export const sendProjectEmailAction: FormView["action"] = async ({
-	id,
-	data,
-}) => {
+export const sendProjectEmailAction: FormViewAction = async ({ id, data }) => {
 	"use server";
 	console.log("id", id);
 	console.log("data", data);

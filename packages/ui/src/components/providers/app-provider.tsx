@@ -5,6 +5,7 @@ import { redirect, useRouter } from "next/navigation";
 
 import { createContext, useContext } from "react";
 import { AuthProvider } from "./auth-provider";
+import { ThemeProvider } from "../theme-provider";
 
 export const AppContext = createContext<{
 	config: AppConfig;
@@ -32,7 +33,16 @@ export function AppProvider({
 	return (
 		<AppContext.Provider value={value}>
 			<QueryProvider>
-				<AuthProvider>{children}</AuthProvider>
+				<AuthProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						{children}
+					</ThemeProvider>
+				</AuthProvider>
 				<Toaster />
 			</QueryProvider>
 		</AppContext.Provider>

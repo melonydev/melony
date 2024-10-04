@@ -28,7 +28,7 @@ export function ProjectPopover({ title }: { title: string }) {
 			</Avatar>
 
 			<div className="text-left">
-				<div className="text-sm font-semibold">{title}</div>
+				<div className="font-semibold">{title}</div>
 			</div>
 		</div>
 	);

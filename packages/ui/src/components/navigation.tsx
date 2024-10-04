@@ -3,6 +3,7 @@
 import * as icons from "lucide-react";
 import { cn } from "../lib";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 const NavigationContext = React.createContext<{
 	activePathname: string;
@@ -46,12 +47,14 @@ export function NavigationItem({
 }) {
 	const navContext = React.useContext(NavigationContext);
 
+	const pathname = usePathname();
+
 	return (
 		<div
 			className={cn(
-				"px-3 h-8 text-foreground/60 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
+				"px-3 h-8 text-foreground/60 relative cursor-pointer inline-flex overflow-hidden items-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-sm justify-start",
 				{
-					"text-accent-foreground bg-muted": navContext.activePathname === id,
+					"text-accent-foreground bg-muted": pathname.includes(id || ""),
 				},
 			)}
 			onClick={() => {

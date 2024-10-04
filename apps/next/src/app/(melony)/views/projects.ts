@@ -1,4 +1,4 @@
-import { Field, View } from "melony";
+import { defineView, Field } from "melony";
 import {
 	createProjectAction,
 	getOneProjectAction,
@@ -47,96 +47,107 @@ const fields: Record<string, Field> = {
 	},
 };
 
-export const projectsListView: View = {
-	type: "list",
-	title: "Projects",
-	fields: fields,
-	action: listProjectsAction,
-	headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
-	itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
-	onItemClick: { viewId: "projectDetailedView" },
-	showInNavigation: true,
-};
-
-export const projectsMiniListView: View = {
-	type: "list",
-	title: "Projects",
-	fields: {
-		title: { label: "Title" },
-		amount: {
-			label: "Amount",
-			description: "Grand amount of the current project.",
-			type: "number",
-			hasAccess: async ({ user }) => {
-				"use server";
-				return user?.email === "d.daraselia@gmail.com";
-			},
-		},
-		customerId: {
-			label: "Customer",
-			type: "relationship",
-			getSuggestions: getCustomerSuggestions,
-			valueAsNumber: true,
-			displayField: "customer",
-		},
-		ownerId: {
-			label: "Owner",
-			type: "relationship",
-			getSuggestions: getUserSuggestions,
-			valueAsNumber: true,
-			displayField: "owner",
-		},
-		statusId: {
-			label: "Status",
-			type: "relationship",
-			getSuggestions: getProjectStatusSuggestions,
-			valueAsNumber: true,
-			displayField: "status",
-		},
+export const projectsListView = defineView(
+	"list",
+	{
+		title: "Projects",
+		fields: fields,
+		headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
+		itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
+		onItemClick: { viewId: "projectDetailedView" },
+		showInNavigation: true,
 	},
-	action: listProjectsAction,
-	itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
-	onItemClick: { viewId: "projectDetailedView" },
-};
+	listProjectsAction,
+);
 
-export const projectCreateView: View = {
-	type: "form",
-	title: "Create Project",
-	fields: fields,
-	action: createProjectAction,
-};
-
-export const projectEditView: View = {
-	type: "form",
-	title: "Edit Project",
-	fields: fields,
-	isDocRequired: true,
-	getDefaultValues: getOneProjectAction,
-	action: updateProjectAction,
-};
-
-export const projectDetailedView: View = {
-	type: "detail",
-	fields: fields,
-	action: getOneProjectAction,
-	headerButtons: [{ label: "Edit", viewId: "projectEditView" }],
-	tabs: [
-		{
-			label: "Tasks",
-			viewId: "tasksListView",
-			setContext: async ({ searchParams }) => {
-				"use server";
-
-				return {
-					initialFilter: [
-						{
-							field: "projectId",
-							operator: "Is",
-							value: searchParams?.id,
-						},
-					],
-				};
+export const projectsMiniListView = defineView(
+	"list",
+	{
+		title: "Projects",
+		fields: {
+			title: { label: "Title" },
+			amount: {
+				label: "Amount",
+				description: "Grand amount of the current project.",
+				type: "number",
+				hasAccess: async ({ user }) => {
+					"use server";
+					return user?.email === "d.daraselia@gmail.com";
+				},
+			},
+			customerId: {
+				label: "Customer",
+				type: "relationship",
+				getSuggestions: getCustomerSuggestions,
+				valueAsNumber: true,
+				displayField: "customer",
+			},
+			ownerId: {
+				label: "Owner",
+				type: "relationship",
+				getSuggestions: getUserSuggestions,
+				valueAsNumber: true,
+				displayField: "owner",
+			},
+			statusId: {
+				label: "Status",
+				type: "relationship",
+				getSuggestions: getProjectStatusSuggestions,
+				valueAsNumber: true,
+				displayField: "status",
 			},
 		},
-	],
-};
+		itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
+		onItemClick: { viewId: "projectDetailedView" },
+	},
+	listProjectsAction,
+);
+
+export const projectCreateView = defineView(
+	"form",
+	{
+		title: "Create Project",
+		fields: fields,
+	},
+	createProjectAction,
+);
+
+export const projectEditView = defineView(
+	"form",
+	{
+		title: "Edit Project",
+		fields: fields,
+		isDocRequired: true,
+		getDefaultValues: getOneProjectAction,
+	},
+	updateProjectAction,
+);
+
+export const projectDetailedView = defineView(
+	"detail",
+	{
+		title: "Project Details",
+		fields: fields,
+		headerButtons: [{ label: "Edit", viewId: "projectEditView" }],
+		tabs: [
+			{
+				label: "Tasks",
+				viewId: "tasksListView",
+				setContext: async ({ searchParams }) => {
+					"use server";
+
+					return {
+						initialFilter: [
+							{
+								field: "projectId",
+								operator: "Is",
+								value: searchParams?.id,
+							},
+						],
+					};
+				},
+			},
+		],
+	},
+	getOneProjectAction,
+);

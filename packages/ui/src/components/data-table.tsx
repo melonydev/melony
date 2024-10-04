@@ -122,7 +122,7 @@ export function DataTable<TData, TValue>({
 	};
 
 	return (
-		<div className="flex flex-col flex-1">
+		<div className="flex flex-col">
 			<Table>
 				<TableHeader>
 					{table.getHeaderGroups().map((headerGroup) => (

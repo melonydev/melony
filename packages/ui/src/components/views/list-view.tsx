@@ -1,10 +1,5 @@
 import React from "react";
-import {
-	BaseContext,
-	Field,
-	FilterItem,
-	ListView as ListViewTD,
-} from "@melony/types";
+import { BaseContext, Field, FilterItem, ListViewProps } from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "../data-table";
 import { useApp } from "../providers/app-provider";
@@ -125,7 +120,7 @@ export function ListView({
 		[filterValues],
 	);
 
-	const view = config?.views?.[viewId] as ListViewTD;
+	const view = config?.views?.[viewId] as ListViewProps;
 	const fields = view?.fields || {};
 
 	const filterableFilters = Object.fromEntries(
@@ -145,33 +140,37 @@ export function ListView({
 	if (!view) return null;
 
 	return (
-		<div className="flex flex-col h-full">
-			<div className="p-3 flex items-center gap-2">
-				<HeaderButtons viewId={viewId} />
+		<div className="p-0">
+			<div className="flex flex-col h-full">
+				<div className="p-3 flex items-center gap-2 justify-between">
+					<div>
+						{Object.keys(filterableFilters).length > 0 && (
+							<AdvancedFilter
+								fields={filterableFilters}
+								initialValues={filterValues}
+								onChange={setFilterValues}
+							/>
+						)}
+					</div>
 
-				{Object.keys(filterableFilters).length > 0 && (
-					<AdvancedFilter
-						fields={filterableFilters}
-						initialValues={filterValues}
-						onChange={setFilterValues}
+					<HeaderButtons viewId={viewId} />
+				</div>
+
+				<div className="flex-1 flex flex-col">
+					<DataTable<any, any>
+						columns={convertFieldsToColumns(viewId, fields)}
+						data={data?.items || []}
+						isLoading={isLoading}
+						pagination={pagination}
+						sorting={sorting}
+						total={data?.meta?.total || 0}
+						onClickRow={(item) => {
+							navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
+						}}
+						onPaginationChange={setPagination}
+						onSortingChange={setSorting}
 					/>
-				)}
-			</div>
-
-			<div className="flex-1 flex flex-col">
-				<DataTable<any, any>
-					columns={convertFieldsToColumns(viewId, fields)}
-					data={data?.items || []}
-					isLoading={isLoading}
-					pagination={pagination}
-					sorting={sorting}
-					total={data?.meta?.total || 0}
-					onClickRow={(item) => {
-						navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
-					}}
-					onPaginationChange={setPagination}
-					onSortingChange={setSorting}
-				/>
+				</div>
 			</div>
 		</div>
 	);

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useApp } from "../providers/app-provider";
-import { BaseContext, ListView } from "@melony/types";
+import { BaseContext, ListViewProps } from "@melony/types";
 
 export function HeaderButtons({
 	viewId,
@@ -13,7 +13,7 @@ export function HeaderButtons({
 
 	const id = ctx?.searchParams?.id;
 
-	const view = config?.views?.[viewId] as ListView;
+	const view = config?.views?.[viewId] as ListViewProps;
 	const headerButtons = view?.headerButtons || [];
 
 	if (headerButtons.length === 0) return null;

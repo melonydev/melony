@@ -1,4 +1,4 @@
-import { DetailView, Field, View } from "melony";
+import { defineView, Field } from "melony";
 import {
 	getOneProjectStatusAction,
 	listProjectStatusesAction,
@@ -13,36 +13,40 @@ const fields: Record<string, Field> = {
 	},
 };
 
-export const projectStatusesListView: View = {
-	type: "list",
-	title: "Project Statuses",
-	fields,
-	action: listProjectStatusesAction,
-	onItemClick: { viewId: "projectStatusDetailedView" },
-};
+export const projectStatusesListView = defineView(
+	"list",
+	{
+		title: "Project Statuses",
+		fields,
+		onItemClick: { viewId: "projectStatusDetailedView" },
+	},
+	listProjectStatusesAction,
+);
 
-export const projectStatusDetailedView: DetailView = {
-	type: "detail",
-	title: "Project Status",
-	fields,
-	action: getOneProjectStatusAction,
-	tabs: [
-		{
-			label: "Projects",
-			viewId: "projectsMiniListView",
-			setContext: async ({ searchParams }) => {
-				"use server";
+export const projectStatusDetailedView = defineView(
+	"detail",
+	{
+		title: "Project Status",
+		fields,
+		tabs: [
+			{
+				label: "Projects",
+				viewId: "projectsMiniListView",
+				setContext: async ({ searchParams }) => {
+					"use server";
 
-				return {
-					initialFilter: [
-						{
-							field: "statusId",
-							operator: "Is",
-							value: searchParams?.id,
-						},
-					],
-				};
+					return {
+						initialFilter: [
+							{
+								field: "statusId",
+								operator: "Is",
+								value: searchParams?.id,
+							},
+						],
+					};
+				},
 			},
-		},
-	],
-};
+		],
+	},
+	getOneProjectStatusAction,
+);

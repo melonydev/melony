@@ -23,7 +23,6 @@ export * from "./components/color-picker";
 export * from "./components/data-table";
 export * from "./components/navigation";
 export * from "./components/sidebar";
-export * from "./components/providers/theme-provider";
 export * from "./components/providers/query-provider";
 export * from "./components/providers/auth-provider";
 export * from "./components/providers/app-provider";
