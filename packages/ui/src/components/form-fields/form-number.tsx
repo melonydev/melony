@@ -26,21 +26,31 @@ export function FormNumber({
 			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					<FormLabel>{field?.label || fieldKey}</FormLabel>
-					<FormControl>
-						<Input
-							type="number"
-							value={rhfField.value}
-							onChange={(e) => {
-								rhfField.onChange(e.target.valueAsNumber);
-							}}
-							disabled={field?.isReadOnly}
-						/>
-					</FormControl>
-					{field?.description && (
-						<FormDescription>{field?.description}</FormDescription>
-					)}
-					<FormMessage />
+					<div className="grid grid-cols-12">
+						<div className="col-span-4">
+							<FormLabel>{field?.label || fieldKey}</FormLabel>
+						</div>
+
+						<div className="col-span-8">
+							<FormControl>
+								<div className="flex flex-col gap-1">
+									<Input
+										type="number"
+										value={rhfField.value}
+										onChange={(e) => {
+											rhfField.onChange(e.target.valueAsNumber);
+										}}
+										disabled={field?.isReadOnly}
+									/>
+
+									{field?.description && (
+										<FormDescription>{field?.description}</FormDescription>
+									)}
+									<FormMessage />
+								</div>
+							</FormControl>
+						</div>
+					</div>
 				</FormItem>
 			)}
 		/>

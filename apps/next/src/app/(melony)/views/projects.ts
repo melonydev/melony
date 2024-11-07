@@ -1,4 +1,4 @@
-import { defineView, Field } from "melony";
+import { defineView, Field, listView } from "melony";
 import {
 	createProjectAction,
 	getOneProjectAction,
@@ -10,6 +10,15 @@ import { getUserSuggestions } from "../actions/user";
 import { getProjectStatusSuggestions } from "../actions/project-status";
 
 const fields: Record<string, Field> = {
+	statusId: {
+		label: "Status",
+		type: "relationship",
+		getSuggestions: getProjectStatusSuggestions,
+		valueAsNumber: true,
+		displayField: "status",
+		filterable: true,
+		sortable: true,
+	},
 	title: { label: "Title", filterable: true },
 	amount: {
 		label: "Amount",
@@ -36,29 +45,17 @@ const fields: Record<string, Field> = {
 		displayField: "owner",
 		filterable: true,
 	},
-	statusId: {
-		label: "Status",
-		type: "relationship",
-		getSuggestions: getProjectStatusSuggestions,
-		valueAsNumber: true,
-		displayField: "status",
-		filterable: true,
-		sortable: true,
-	},
 };
 
-export const projectsListView = defineView(
-	"list",
-	{
-		title: "Projects",
-		fields: fields,
-		headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
-		itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
-		onItemClick: { viewId: "projectDetailedView" },
-		showInNavigation: true,
-	},
-	listProjectsAction,
-);
+export const projectsListView = listView({
+	action: listProjectsAction,
+	title: "Projects",
+	fields: fields,
+	headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
+	itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
+	onItemClick: { viewId: "projectDetailedView" },
+	showInNavigation: true,
+});
 
 export const projectsMiniListView = defineView(
 	"list",

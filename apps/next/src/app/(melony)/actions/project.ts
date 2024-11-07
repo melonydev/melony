@@ -9,9 +9,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { DetailViewAction, FormViewAction, ListViewAction } from "melony";
 
 export const listProjectsAction: ListViewAction = async ({
-	filter,
-	paginate,
-	sort,
+	searchParams: { filter, paginate, sort },
 }) => {
 	const { isAuthenticated } = getKindeServerSession();
 
@@ -42,9 +40,11 @@ export const listProjectsAction: ListViewAction = async ({
 	};
 };
 
-export const getOneProjectAction: DetailViewAction = async ({ id }) => {
+export const getOneProjectAction: DetailViewAction = async ({
+	searchParams,
+}) => {
 	const doc = await prisma.project.findUnique({
-		where: { id: Number(id) },
+		where: { id: Number(searchParams?.id) },
 		include: { customer: true, owner: true, status: true },
 	});
 

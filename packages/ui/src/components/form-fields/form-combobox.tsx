@@ -37,21 +37,32 @@ export function FormCombobox({
 			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					{!simple && <FormLabel>{field?.label || fieldKey}</FormLabel>}
-					<FormControl>
-						<Combobox
-							options={data}
-							value={`${rhfField.value}`} // make it always string
-							onChange={(val) => {
-								rhfField.onChange(field?.valueAsNumber ? parseInt(val) : val);
-							}}
-							isLoading={isLoading}
-						/>
-					</FormControl>
-					{field?.description && (
-						<FormDescription>{field?.description}</FormDescription>
-					)}
-					<FormMessage />
+					<div className="grid grid-cols-12">
+						{!simple && (
+							<div className="col-span-4">
+								<FormLabel>{field?.label || fieldKey}</FormLabel>
+							</div>
+						)}
+
+						<div className="col-span-8">
+							<FormControl>
+								<Combobox
+									options={data}
+									value={`${rhfField.value}`} // make it always string
+									onChange={(val) => {
+										rhfField.onChange(
+											field?.valueAsNumber ? parseInt(val) : val,
+										);
+									}}
+									isLoading={isLoading}
+								/>
+							</FormControl>
+							{field?.description && (
+								<FormDescription>{field?.description}</FormDescription>
+							)}
+							<FormMessage />
+						</div>
+					</div>
 				</FormItem>
 			)}
 		/>

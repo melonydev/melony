@@ -28,14 +28,25 @@ export function FormText({
 			name={fieldKey}
 			render={({ field: rhfField }) => (
 				<FormItem>
-					{!simple && <FormLabel>{field?.label || fieldKey}</FormLabel>}
-					<FormControl>
-						<Input {...rhfField} disabled={field?.isReadOnly} />
-					</FormControl>
-					{field?.description && (
-						<FormDescription>{field?.description}</FormDescription>
-					)}
-					<FormMessage />
+					<div className="grid grid-cols-12">
+						{!simple && (
+							<div className="col-span-4">
+								<FormLabel>{field?.label || fieldKey}</FormLabel>
+							</div>
+						)}
+						<div className="col-span-8">
+							<FormControl>
+								<div className="flex flex-col gap-1">
+									<Input {...rhfField} disabled={field?.isReadOnly} />
+
+									{field?.description && (
+										<FormDescription>{field?.description}</FormDescription>
+									)}
+									<FormMessage />
+								</div>
+							</FormControl>
+						</div>
+					</div>
 				</FormItem>
 			)}
 		/>

@@ -105,7 +105,7 @@ export function AdvancedFilter({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline">
+				<Button variant="secondary">
 					{/* <Filter className="h-4 w-4 mr-2" /> */}
 					Filter{" "}
 					{initialValues.length > 0 && (

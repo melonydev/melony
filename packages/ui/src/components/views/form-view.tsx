@@ -6,6 +6,7 @@ import { useToast } from "../ui/use-toast";
 import { Button } from "../ui/button";
 import { FormFields } from "../form-fields";
 import { useApp } from "../providers/app-provider";
+import { Card } from "../ui/card";
 
 export function FormView({
 	viewId,
@@ -23,7 +24,7 @@ export function FormView({
 
 	const { data: getDefaultValues, isLoading } = useQuery({
 		queryKey: [viewId, "getDefaultValues", id],
-		queryFn: () => view?.getDefaultValues && view?.getDefaultValues({ id }),
+		queryFn: () => view?.getDefaultValues && view?.getDefaultValues(ctx),
 		enabled: !!view?.getDefaultValues && !!id,
 	});
 
@@ -41,10 +42,16 @@ export function FormView({
 		mutate(
 			{ data },
 			{
-				onSuccess: () => {
-					// toast({
-					// 	title: "Executed successfully",
-					// });
+				onSuccess: (res) => {
+					if (res?.message) {
+						toast({
+							title: res.message,
+						});
+					}
+
+					if (res?.url) {
+						window.open(res.url);
+					}
 				},
 				onError: (error) => {
 					toast({
@@ -68,20 +75,27 @@ export function FormView({
 	const fields = view?.fields || {};
 
 	return (
-		<div className="p-8">
-			<div className="grid grid-cols-12">
-				<div className="col-span-8">
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-							<FormFields fields={fields} />
+		<Card className="h-full w-full bg-sidebar dark:bg-sidebar">
+			<div className="p-8">
+				<div className="grid grid-cols-12">
+					<div className="col-span-8">
+						<Form {...form}>
+							<form
+								onSubmit={form.handleSubmit(onSubmit)}
+								className="space-y-4"
+							>
+								<FormFields fields={fields} />
 
-							<Button type="submit" disabled={isPending}>
-								{isPending ? "Executing..." : "Execute"}
-							</Button>
-						</form>
-					</Form>
+								<div className="py-4" />
+
+								<Button type="submit" disabled={isPending}>
+									{isPending ? "Executing..." : "Execute"}
+								</Button>
+							</form>
+						</Form>
+					</div>
 				</div>
 			</div>
-		</div>
+		</Card>
 	);
 }
