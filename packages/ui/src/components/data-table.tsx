@@ -122,40 +122,43 @@ export function DataTable<TData, TValue>({
 	};
 
 	return (
-		<div className="flex flex-col">
-			<Table>
-				<TableHeader>
-					{table.getHeaderGroups().map((headerGroup) => (
-						<TableRow key={headerGroup.id} className="hover:bg-[transparent]">
-							{headerGroup.headers.map((header, i) => {
-								return (
-									<TableHead
-										key={header.id}
-										className={cn("truncate")}
-										style={{
-											width:
-												i === 1 && header.getSize() === defaultColumnSizing.size
-													? "auto"
-													: header.getSize(),
-										}} // considering that first column is always checkbox and second is always wider because we expect this is a main title if its not equal to default
-									>
-										{header.isPlaceholder
-											? null
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
-									</TableHead>
-								);
-							})}
-						</TableRow>
-					))}
-				</TableHeader>
-				<TableBody>{renderBody()}</TableBody>
-			</Table>
+		<div className="flex flex-col h-full">
+			<div className="flex-1 overflow-hidden flex flex-col">
+				<Table>
+					<TableHeader className="top-0 rounded-t-xl z-10">
+						{table.getHeaderGroups().map((headerGroup) => (
+							<TableRow key={headerGroup.id} className="hover:bg-[transparent]">
+								{headerGroup.headers.map((header, i) => {
+									return (
+										<TableHead
+											key={header.id}
+											className={cn("truncate")}
+											style={{
+												width:
+													i === 1 &&
+													header.getSize() === defaultColumnSizing.size
+														? "auto"
+														: header.getSize(),
+											}} // considering that first column is always checkbox and second is always wider because we expect this is a main title if its not equal to default
+										>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+														header.column.columnDef.header,
+														header.getContext(),
+													)}
+										</TableHead>
+									);
+								})}
+							</TableRow>
+						))}
+					</TableHeader>
+					<TableBody className="overflow-auto">{renderBody()}</TableBody>
+				</Table>
 
-			<div className="p-3">
-				<DataTablePagination table={table} />
+				<div className="p-3">
+					<DataTablePagination table={table} />
+				</div>
 			</div>
 		</div>
 	);

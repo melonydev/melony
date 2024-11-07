@@ -1,4 +1,12 @@
 import React from "react";
+import { SidebarTrigger } from "./ui/sidebar";
+import { Separator } from "./ui/separator";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+} from "./ui/breadcrumb";
 
 export function Page({ children }: { children: React.ReactNode }) {
 	return (
@@ -18,21 +26,28 @@ export const PageHeader = ({
 	actions?: JSX.Element | JSX.Element[];
 }) => {
 	return (
-		<div className="h-[49px] py-1 px-3">
-			<div className="h-full flex items-center justify-between">
-				<div className="flex flex-col">
-					<div className="font-semibold">{title}</div>
-					{description && (
-						<div className="text-xs opacity-60">{description}</div>
-					)}
-				</div>
+		<header className="sticky z-20 top-0 flex h-14 shrink-0 items-center gap-2 bg-background">
+			<div className="flex flex-1 items-center gap-2 px-4">
+				<SidebarTrigger className="-ml-1" />
+				<Separator orientation="vertical" className="mr-2 h-4" />
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem className="hidden md:block">
+							<BreadcrumbLink href="#">{title}</BreadcrumbLink>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 
 				{actions && <div>{actions}</div>}
 			</div>
-		</div>
+		</header>
 	);
 };
 
 export const PageBody = ({ children }: { children: React.ReactNode }) => {
-	return <div className="relative overflow-auto h-full w-full">{children}</div>;
+	return (
+		<div className="flex flex-1 flex-col gap-4 px-4 pb-4 overflow-auto">
+			{children}
+		</div>
+	);
 };

@@ -1,12 +1,12 @@
 import { BaseContext, DetailViewProps } from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
-import { Label } from "../ui/label";
 import { DEFAULT_COMPONENTS_MAP } from "@/constants";
 import { useApp } from "../providers/app-provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ViewRenderer } from "../view-renderer";
 import { HeaderButtons } from "../actions/header-buttons";
 import { cn } from "@/lib";
+import { Card } from "../ui/card";
 
 export function DetailView({
 	viewId,
@@ -23,7 +23,7 @@ export function DetailView({
 
 	const { data, isLoading } = useQuery({
 		queryKey: [viewId, id],
-		queryFn: () => view?.action({ id }),
+		queryFn: () => view?.action(ctx),
 		enabled: !!id,
 	});
 
@@ -36,46 +36,21 @@ export function DetailView({
 	if (!id) return <div className="p-4">ID required</div>;
 
 	return (
-		<div className="p-4">
-			<div className="flex flex-col gap-8">
-				<HeaderButtons viewId={viewId} ctx={ctx} />
+		<Card className="h-full w-full bg-sidebar dark:bg-sidebar">
+			<div className="flex flex-col h-full">
+				{(view?.headerButtons || []).length > 0 && (
+					<div className="p-2 flex items-center gap-2 justify-between border-b">
+						<HeaderButtons viewId={viewId} ctx={ctx} />
+					</div>
+				)}
 
-				<div className="grid grid-cols-12 gap-8">
-					{view?.tabs && (
-						<div className="col-span-8">
-							<Tabs
-								defaultValue={view.tabs[0]?.viewId}
-								className="w-full rounded-md"
-							>
-								<TabsList>
-									{view.tabs.map((tabElement) => (
-										<TabsTrigger
-											key={tabElement.viewId}
-											value={tabElement.viewId}
-										>
-											{tabElement.label}
-										</TabsTrigger>
-									))}
-								</TabsList>
-
-								{view.tabs.map((tabElement) => (
-									<TabsContent
-										key={tabElement.viewId}
-										value={tabElement.viewId}
-									>
-										<ViewRenderer
-											viewId={tabElement.viewId}
-											ctx={{ ...ctx }}
-											setContext={tabElement?.setContext}
-										/>
-									</TabsContent>
-								))}
-							</Tabs>
-						</div>
-					)}
-
-					<div className={cn("col-span-4", { "col-span-12": !view?.tabs })}>
-						<div className="flex flex-col rounded-md px-4">
+				<div className="grid grid-cols-12 flex-1">
+					<div
+						className={cn("col-span-3 bg-background/20 border-r", {
+							"col-span-12": !view?.tabs,
+						})}
+					>
+						<div className="flex flex-col rounded-md py-2 px-4">
 							{Object.keys(fields).map((fieldKey) => {
 								const field = fields[fieldKey];
 
@@ -96,13 +71,13 @@ export function DetailView({
 										key={fieldKey}
 										className="grid grid-cols-12 items-center py-2"
 									>
-										<div className="col-span-4">
+										<div className="col-span-5">
 											<div className="text-sm text-muted-foreground">
 												{field?.label || fieldKey}
 											</div>
 										</div>
 
-										<div className="col-span-8">
+										<div className="text-sm col-span-7">
 											<Comp field={field} value={value} />
 										</div>
 									</div>
@@ -110,8 +85,42 @@ export function DetailView({
 							})}
 						</div>
 					</div>
+
+					{view?.tabs && (
+						<div className="col-span-9">
+							<Tabs
+								defaultValue={view.tabs[0]?.viewId}
+								className="w-full h-full flex flex-col rounded-md"
+							>
+								<TabsList>
+									{view.tabs.map((tabElement) => (
+										<TabsTrigger
+											key={tabElement.viewId}
+											value={tabElement.viewId}
+										>
+											{tabElement.label}
+										</TabsTrigger>
+									))}
+								</TabsList>
+
+								{view.tabs.map((tabElement) => (
+									<TabsContent
+										key={tabElement.viewId}
+										value={tabElement.viewId}
+										className="flex flex-1"
+									>
+										<ViewRenderer
+											view={tabElement.viewId}
+											ctx={{ ...ctx }}
+											setContext={tabElement?.setContext}
+										/>
+									</TabsContent>
+								))}
+							</Tabs>
+						</div>
+					)}
 				</div>
 			</div>
-		</div>
+		</Card>
 	);
 }

@@ -27,3 +27,11 @@ export const formatDateTime = (date: string) => {
 export const formatDateToISOLocal = (date: string) => {
 	return dayjs(date).format();
 };
+
+export function tryParseJSON(str: string) {
+	try {
+		return JSON.parse(str);
+	} catch (e) {
+		return str;
+	}
+}

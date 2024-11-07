@@ -3,22 +3,30 @@ import { DetailView } from "./views/detail-view";
 import { ListView } from "./views/list-view";
 import { useApp } from "./providers/app-provider";
 import { EmptyView } from "./views/empty-view";
-import { BaseContext, ContextUpdater } from "@melony/types";
+import {
+	BaseContext,
+	ContextUpdater,
+	ListViewProps,
+	View,
+} from "@melony/types";
 import { useQuery } from "@tanstack/react-query";
+import { ChatView } from "./views/chat-view";
 
 export function ViewRenderer({
-	viewId,
+	view: viewOrId,
 	ctx,
 	setContext,
 }: {
-	viewId: string;
+	view: string | View;
 	ctx: BaseContext;
 	setContext?: ContextUpdater;
 }) {
 	const { config } = useApp();
 
 	const views = config?.views || {};
-	const view = views[viewId];
+
+	const viewId = typeof viewOrId === "string" ? viewOrId : "unknownViewId";
+	const view = typeof viewOrId === "object" ? viewOrId : views[viewId];
 
 	const { data: nextContext = {}, isLoading } = useQuery({
 		queryKey: [viewId, "setContext", viewId, ctx],
@@ -30,14 +38,35 @@ export function ViewRenderer({
 
 	if (!view) return <EmptyView title="View not found" />;
 
-	// render list, doc or form page
 	if (view.type === "list") {
-		return <ListView viewId={viewId} ctx={{ ...ctx, ...nextContext }} />;
+		return (
+			<ListView
+				view={viewOrId as string | ListViewProps}
+				ctx={{ ...ctx, ...nextContext }}
+			/>
+		);
 	}
 
 	if (view.type === "detail") {
-		return <DetailView viewId={viewId} ctx={{ ...ctx, ...nextContext }} />;
+		return (
+			<DetailView
+				viewId={viewOrId as string}
+				ctx={{ ...ctx, ...nextContext }}
+			/>
+		);
 	}
 
-	return <FormView viewId={viewId} ctx={{ ...ctx, ...nextContext }} />;
+	if (view.type === "chat") {
+		return (
+			<ChatView viewId={viewOrId as string} ctx={{ ...ctx, ...nextContext }} />
+		);
+	}
+
+	if (view.type === "form") {
+		return (
+			<FormView viewId={viewOrId as string} ctx={{ ...ctx, ...nextContext }} />
+		);
+	}
+
+	return <div>Wrong view type.</div>;
 }

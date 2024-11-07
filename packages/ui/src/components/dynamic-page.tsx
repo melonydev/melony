@@ -37,7 +37,7 @@ export function DynamicPage(props: any) {
 			/>
 
 			<PageBody>
-				<ViewRenderer viewId={viewId} ctx={{ searchParams }} />
+				<ViewRenderer view={viewId} ctx={{ searchParams }} />
 			</PageBody>
 		</Page>
 	);

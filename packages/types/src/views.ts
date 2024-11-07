@@ -1,7 +1,6 @@
-import { ID } from "./config";
+import { BaseContext } from "./config";
 import { ButtonElement, TabElement } from "./elements";
 import { Field } from "./fields";
-import { FilterItem } from "./filters";
 import { HasAccess } from "./permissions";
 
 // BASE VIEW
@@ -20,21 +19,19 @@ export type ListViewResponse = {
 	items: any;
 	meta?: { total: number };
 };
-export type ListViewParams = {
-	q?: string;
-	filter?: FilterItem[];
-	sort?: {
-		id: string;
-		desc: boolean;
-	}[];
-	paginate?: { pageIndex: number; pageSize: number };
-};
-export type ListViewAction = (
-	params: ListViewParams,
-) => Promise<ListViewResponse>;
+// export type ListViewParams = {
+// 	q?: string;
+// 	filter?: FilterItem[];
+// 	sort?: {
+// 		id: string;
+// 		desc: boolean;
+// 	}[];
+// 	paginate?: { pageIndex: number; pageSize: number };
+// };
+export type ListViewAction = (ctx: BaseContext) => Promise<ListViewResponse>;
 export type ListViewProps = BaseView & {
 	type: "list";
-	action: ListViewAction;
+	action: ListViewAction | string;
 	onItemClick?: {
 		viewId: string;
 	};
@@ -44,9 +41,8 @@ export type ListViewProps = BaseView & {
 
 // DETAIL VIEW
 export type DetailViewResponse = Record<string, unknown>;
-export type DetailViewParams = { id?: ID };
 export type DetailViewAction = (
-	params: DetailViewParams,
+	ctx: BaseContext,
 ) => Promise<DetailViewResponse>;
 export type DetailViewProps = BaseView & {
 	type: "detail";
@@ -65,18 +61,34 @@ export type FormViewNotifyResponse = {
 export type FormViewResponse =
 	| FormViewNavigateResponse
 	| FormViewNotifyResponse;
-export type FormViewParams = { id?: ID; data?: any };
-export type FormViewAction = (
-	params: FormViewParams,
-) => Promise<FormViewResponse>;
+export type FormViewAction = (payload: {
+	id: any;
+	data: any;
+}) => Promise<FormViewResponse>;
 export type FormViewProps = BaseView & {
 	type: "form";
 	action: FormViewAction;
-	getDefaultValues?: ({ id }: { id: ID }) => Promise<any>;
+	getDefaultValues?: (ctx: BaseContext) => Promise<any>;
 };
 
-export type View = ListViewProps | DetailViewProps | FormViewProps;
+// CHAT VIEW
+export type ChatViewProps = BaseView & {
+	type: "chat";
+	getInitialMessagesAction: (ctx: BaseContext) => any;
+	action?: string;
+};
 
+// VIEW
+export type View =
+	| ListViewProps
+	| DetailViewProps
+	| FormViewProps
+	| ChatViewProps;
+
+// TODO: NEEDS TO BE REMOVED
+//
+//
+//
 // DEFINE VIEW
 export type ViewType = View["type"];
 

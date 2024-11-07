@@ -14,6 +14,8 @@ import { HeaderButtons } from "../actions/header-buttons";
 import { AdvancedFilter } from "../advanced-filter";
 import { Button } from "../ui/button";
 import { ArrowDownIcon, ArrowDownUpIcon, ArrowUpIcon } from "lucide-react";
+import { APIClient } from "@/lib/api-client";
+import { Card } from "../ui/card";
 
 const convertFieldsToColumns = (
 	viewId: string,
@@ -89,13 +91,19 @@ const convertFieldsToColumns = (
 };
 
 export function ListView({
-	viewId,
+	view: viewOrId,
 	ctx,
 }: {
-	viewId: string;
-	ctx: BaseContext;
+	view: string | Omit<ListViewProps, "type">;
+	ctx?: BaseContext;
 }) {
 	const { navigate, config } = useApp();
+
+	const viewId = typeof viewOrId === "string" ? viewOrId : "unknownViewId";
+	const view =
+		typeof viewOrId === "object"
+			? viewOrId
+			: (config?.views?.[viewId] as ListViewProps);
 
 	const [filterValues, setFilterValues] = React.useState<FilterItem[]>([]);
 
@@ -120,50 +128,80 @@ export function ListView({
 		[filterValues],
 	);
 
-	const view = config?.views?.[viewId] as ListViewProps;
-	const fields = view?.fields || {};
+	const { data, isLoading } = useQuery<any, any>({
+		queryKey: [viewId, ctx, memoizedFilterValues, pagination, sorting],
+		queryFn: () => {
+			return typeof view?.action === "string"
+				? APIClient.get(view.action, {
+						params: {
+							searchParams: {
+								filter: [...(ctx?.initialFilter || []), ...filterValues],
+								paginate: pagination,
+								sort: sorting,
+							},
+						},
+					})
+				: view?.action
+					? view?.action({
+							searchParams: {
+								filter: [...(ctx?.initialFilter || []), ...filterValues],
+								paginate: pagination,
+								sort: sorting,
+							},
+						})
+					: () => {};
+		},
+	});
+
+	if (!view) return null;
+
+	const convertedData = Array.isArray(data?.data)
+		? { items: data.data, meta: { total: data.data.length } }
+		: data;
+
+	const assembledFields: Record<string, Field> = {};
+	convertedData?.items?.slice(0, 5).forEach((item: any) => {
+		Object.keys(item).forEach((key) => {
+			if (!assembledFields[key]) {
+				assembledFields[key] = {};
+			}
+		});
+	});
+
+	const fields = view?.fields || assembledFields;
 
 	const filterableFilters = Object.fromEntries(
 		Object.entries(fields).filter(([_, field]) => field.filterable),
 	);
 
-	const { data, isLoading } = useQuery({
-		queryKey: [viewId, ctx, memoizedFilterValues, pagination, sorting],
-		queryFn: () =>
-			view?.action({
-				filter: [...(ctx?.initialFilter || []), ...filterValues],
-				paginate: pagination,
-				sort: sorting,
-			}),
-	});
-
-	if (!view) return null;
-
 	return (
-		<div className="p-0">
-			<div className="flex flex-col h-full">
-				<div className="p-3 flex items-center gap-2 justify-between">
-					<div>
-						{Object.keys(filterableFilters).length > 0 && (
-							<AdvancedFilter
-								fields={filterableFilters}
-								initialValues={filterValues}
-								onChange={setFilterValues}
-							/>
-						)}
+		<Card className="h-full w-full bg-sidebar dark:bg-sidebar">
+			<div className="flex flex-col h-full overflow-hidden">
+				{((view?.headerButtons || []).length > 0 ||
+					Object.keys(filterableFilters).length > 0) && (
+					<div className="p-2 flex items-center gap-2 justify-between border-b">
+						<div>
+							{Object.keys(filterableFilters).length > 0 && (
+								<AdvancedFilter
+									fields={filterableFilters}
+									initialValues={filterValues}
+									onChange={setFilterValues}
+								/>
+							)}
+						</div>
+
+						<HeaderButtons viewId={viewId} />
 					</div>
+				)}
 
-					<HeaderButtons viewId={viewId} />
-				</div>
-
-				<div className="flex-1 flex flex-col">
+				<div className="flex-1 flex flex-col overflow-hidden">
 					<DataTable<any, any>
 						columns={convertFieldsToColumns(viewId, fields)}
-						data={data?.items || []}
+						data={convertedData?.items || []}
 						isLoading={isLoading}
 						pagination={pagination}
 						sorting={sorting}
-						total={data?.meta?.total || 0}
+						total={convertedData?.meta?.total || 0}
 						onClickRow={(item) => {
 							navigate(`/${view?.onItemClick?.viewId}?id=${item.id}`);
 						}}
@@ -172,6 +210,6 @@ export function ListView({
 					/>
 				</div>
 			</div>
-		</div>
+		</Card>
 	);
 }

@@ -27,7 +27,7 @@ export function HeaderButtons({
 						onClick={() => {
 							navigate(`/${buttonElement.viewId}${id ? `?id=${id}` : ``}`);
 						}}
-						variant={"outline"}
+						variant={"secondary"}
 					>
 						{buttonElement.label}
 					</Button>

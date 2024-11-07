@@ -11,12 +11,12 @@ model Project {
   id         Int           @id @default(autoincrement())
   title      String
   amount     Float?        @default(0)
-  customer   Customer      @relation(fields: [customerId], references: [id])
   customerId Int
-  owner      User          @relation(fields: [ownerId], references: [id])
   ownerId    Int
-  status     ProjectStatus @relation(fields: [statusId], references: [id])
   statusId   Int
+  status     ProjectStatus @relation(fields: [statusId], references: [id])
+  owner      User          @relation(fields: [ownerId], references: [id])
+  customer   Customer      @relation(fields: [customerId], references: [id])
   tasks      Task[]
 }
 
@@ -29,17 +29,18 @@ model ProjectStatus {
 
 model Task {
   id          Int        @id @default(autoincrement())
-  title       String /// displayField
-  item        Item       @relation(fields: [itemId], references: [id])
+  /// displayField
+  title       String
   itemId      Int
-  project     Project    @relation(fields: [projectId], references: [id])
   projectId   Int
-  status      TaskStatus @relation(fields: [statusId], references: [id])
   statusId    Int
   price       Float
   description String?    @default("")
-  owner       User       @relation(fields: [ownerId], references: [id])
   ownerId     Int
+  owner       User       @relation(fields: [ownerId], references: [id])
+  status      TaskStatus @relation(fields: [statusId], references: [id])
+  project     Project    @relation(fields: [projectId], references: [id])
+  item        Item       @relation(fields: [itemId], references: [id])
 }
 
 model TaskStatus {
@@ -78,4 +79,18 @@ model Item {
   price Float? @default(0)
   type  String
   tasks Task[]
+}
+
+model Conversation {
+  id       String    @id @default(cuid())
+  title    String    @default("")
+  messages Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String
+  content        String
 }
