@@ -8,7 +8,7 @@ Getting started with Melony is quick and easy. The fastest way to begin is by cl
 
 ## DEMO
 
-[https://melony-demo.vercel.app](https://melony-demo.vercel.app){:target="_blank"}
+<a href="https://melony-demo.vercel.app" target="_blank">https://melony-demo.vercel.app</a>
 
 ## Quick Start
 
