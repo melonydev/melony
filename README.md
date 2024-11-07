@@ -1,83 +1,54 @@
 # Melony
 
-## About
+Melony is a framework for backend developers to build internal tools without touching frontend code.
 
-Melony is a powerful and flexible admin panel generator designed exclusively for Next.js applications. It empowers backend developers to create sophisticated, beautiful, and consistent internal tools without writing a single line of frontend code.
+![melony](https://melony.dev/_next/static/media/code-preview.a510de6d.png)
 
-![melony](https://melony.dev/_next/static/media/screen_sm.1bd0bc98.jpg)
-
-## Key Features
-
-- **Next.js Optimized**: Built from the ground up for Next.js, utilizing its API routes and server-side rendering capabilities.
-- **Zero Frontend Code**: Create full-fledged admin panels using only backend configurations.
-- **Beautiful UI**: Crafted to make your internal tools visually appealing out of the box.
-- **Consistent Design**: Ensures a uniform look and feel across all your admin interfaces.
-- **Dynamic View Generation**: Easily create list, detail, and form views with simple configuration.
-- **Flexible Context Handling**: Support for asynchronous context loading in views and tabs.
-- **Customizable Components**: Extensible set of UI components that maintain design consistency.
-- **Type-Safe**: Built with TypeScript for robust type checking and enhanced developer experience.
-- **Responsive Design**: Mobile-friendly interface that adapts to various screen sizes.
-- **Role-Based Access Control**: Built-in support for managing user permissions.
-
-## Our Goal
-
-At Melony, our mission is to revolutionize the creation of internal tools for Next.js applications. We believe that backend developers should be able to create beautiful, consistent, and functional admin interfaces without the need to dive into frontend code. Our goal is to make the process of building internal tools as efficient and enjoyable as possible, while ensuring that the end result is visually appealing and user-friendly.
+Getting started with Melony is quick and easy. The fastest way to begin is by cloning our starter repository, which provides a pre-configured environment with all the necessary dependencies.
 
 ## Quick Start
 
-1. Install Melony in your Next.js project:
+1. Clone the Melony starter repository:
 
-   ```
-   npm install melony
-   ```
+```bash
+git clone https://github.com/melonydev/melony-starter.git
+cd melony-starter
+```
 
-2. Define your views in your Next.js API routes:
+2. Install Dependencies
 
-   ```typescript
-   // pages/api/admin/views/projects.ts
-   import { View } from "melony/config";
-   import { listProjectsAction } from "../actions/projects";
-   import { projectFields } from "../fields/projects";
+```bash
+npm install
+```
 
-   export const projectsListView: View = {
-   	type: "list",
-   	title: "Projects",
-   	fields: projectFields,
-   	action: listProjectsAction,
-   	headerButtons: [{ label: "Create Project", viewId: "projectCreateView" }],
-   	itemButtons: [{ label: "Edit", viewId: "projectEditView" }],
-   	onItemClick: { viewId: "projectDetailedView" },
-   	showInNavigation: true,
-   };
+3. Run the Development Server
 
-   export default projectsListView;
-   ```
+```bash
+npm run dev
+```
 
-3. Set up your admin panel in a Next.js page:
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see your Melony application in action.
 
-   ```typescript
-   // pages/admin/[[...path]].tsx
-   import { MelonyProvider, AdminPanel } from 'melony';
-   import projectsListView from '../api/admin/views/projects';
+## Creating Your First View
 
-   const AdminPage = () => (
-     <MelonyProvider views={[projectsListView]}>
-       <AdminPanel />
-     </MelonyProvider>
-   );
+Melony makes it incredibly easy to create views for your internal tools. Here's a simple example of how to define a view:
 
-   export default AdminPage;
-   ```
+```ts
+import { listView } from "melony";
+import { listUsersAction } from "./actions/user";
 
-And that's it! Your beautiful, consistent admin panel is now ready to use, without writing a single line of frontend code.
+export const usersListView = listView({
+	action: listUsersAction,
+});
+```
+
+This example creates a table component for users with filterable fields, header and item buttons, and navigation settings. The `listUsersAction` is a server action that fetches the user data.
+
+With just this simple definition, Melony will generate a fully functional user interface for listing users, complete with filtering, pagination, and navigation to other views.
 
 ## Documentation
 
-For detailed documentation, please visit our [Wiki](link-to-your-wiki).
-
-## Examples
-
-Check out our [examples directory](link-to-examples) for more sample configurations and usage scenarios.
+For detailed documentation, please visit our [Website](https://melony.dev).
 
 ## Contributing
 
