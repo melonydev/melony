@@ -2,23 +2,30 @@
   "name": "melony",
   "private": true,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "turbo build",
     "dev": "turbo dev",
+    "publish": "turbo publish",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "clean": "turbo run clean --parallel && rimraf .turbo && rimraf node_modules"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "pnpm": "8.15.4",
     "prettier": "^3.2.5",
+    "rimraf": "5.0.5",
     "turbo": "latest"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "pnpm": ">=8.14.1"
   },
-  "packageManager": "npm@9.8.1",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "volta": {
+    "node": "20.11.1"
+  },
+  "dependencies": {
+    "@kinde-oss/kinde-auth-nextjs": "2.3.6"
+  }
 }

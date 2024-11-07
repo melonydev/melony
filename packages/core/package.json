@@ -1,30 +1,29 @@
 {
-  "name": "@melony/core",
-  "version": "0.0.0",
-  "private": true,
-  "exports": {
-    "./config": "./src/config.ts",
-    "./types": "./src/types.ts",
-    "./react": "./src/react/index.ts",
-    "./filter": "./src/filter/index.ts",
-    "./utils": "./src/utils/index.ts"
-  },
-  "scripts": {},
-  "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@turbo/gen": "^1.11.3",
-    "@types/eslint": "^8.56.1",
-    "@types/node": "^20.10.6",
-    "@types/react": "^18.2.46",
-    "@types/react-dom": "^18.2.18",
-    "eslint": "^8.56.0",
-    "react": "^18.2.0",
-    "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "axios": "^1.6.7",
-    "lucide-react": "^0.367.0",
-    "react-query": "^3.39.3"
-  }
+	"name": "melony",
+	"version": "0.0.21",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"dev": "npm run build -- --watch",
+		"lint": "eslint . --max-warnings 0",
+		"generate:component": "turbo gen react-component",
+		"clean": "rimraf .turbo && rimraf node_modules",
+		"build": "tsup",
+		"publish": "npm publish --access public"
+	},
+	"dependencies": {
+		"@melony/types": "^0.0.11",
+		"@melony/ui": "^0.1.19"
+	},
+	"peerDependencies": {
+		"react": "18.3.1",
+		"react-dom": "^18"
+	},
+	"devDependencies": {
+		"@types/react": "18.3.1",
+		"@types/react-dom": "^18",
+		"react-dom": "^18",
+		"tsup": "8.0.2"
+	}
 }

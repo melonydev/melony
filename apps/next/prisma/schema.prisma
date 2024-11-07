@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Project {
+  id         Int           @id @default(autoincrement())
+  title      String
+  amount     Float?        @default(0)
+  customerId Int
+  ownerId    Int
+  statusId   Int
+  status     ProjectStatus @relation(fields: [statusId], references: [id])
+  owner      User          @relation(fields: [ownerId], references: [id])
+  customer   Customer      @relation(fields: [customerId], references: [id])
+  tasks      Task[]
+}
+
+model ProjectStatus {
+  id       Int       @id @default(autoincrement())
+  title    String
+  color    String
+  projects Project[]
+}
+
+model Task {
+  id          Int        @id @default(autoincrement())
+  /// displayField
+  title       String
+  itemId      Int
+  projectId   Int
+  statusId    Int
+  price       Float
+  description String?    @default("")
+  ownerId     Int
+  owner       User       @relation(fields: [ownerId], references: [id])
+  status      TaskStatus @relation(fields: [statusId], references: [id])
+  project     Project    @relation(fields: [projectId], references: [id])
+  item        Item       @relation(fields: [itemId], references: [id])
+}
+
+model TaskStatus {
+  id    Int    @id @default(autoincrement())
+  title String
+  color String
+  tasks Task[]
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  image    String?
+  email    String
+  password String?
+  name     String?
+  projects Project[]
+  tasks    Task[]
+}
+
+model File {
+  id          Int    @id @default(autoincrement())
+  downloadUrl String
+  name        String
+}
+
+model Customer {
+  id       Int       @id @default(autoincrement())
+  title    String
+  projects Project[]
+}
+
+model Item {
+  id    Int    @id @default(autoincrement())
+  title String
+  sku   String
+  price Float? @default(0)
+  type  String
+  tasks Task[]
+}
+
+model Conversation {
+  id       String    @id @default(cuid())
+  title    String    @default("")
+  messages Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String
+  content        String
+}

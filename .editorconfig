@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = tab
+indent_size = 2
+insert_final_newline = false
+trim_trailing_whitespace = true
+
+[*.{json,yaml,yml}]
+indent_size = 2
+
+[*.{ts,tsx}]
+ij_typescript_spaces_within_imports = true
+ij_typescript_spaces_within_object_literal_braces = true
+ij_typescript_align_multiline_parameters = false
+ij_typescript_force_semicolon_style = true
+ij_typescript_reformat_c_style_comments = true
+ij_typescript_use_double_quotes = false
+ij_typescript_force_quote_style = true
+ij_typescript_indent_chained_calls = true
+ij_typescript_keep_first_column_comment = false
+ij_typescript_enforce_trailing_comma = remove

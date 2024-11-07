@@ -17,6 +17,7 @@ coverage
 
 # Turbo
 .turbo
+!/.turbo/**
 
 # Vercel
 .vercel
@@ -36,3 +37,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# cache files for ts incremental builds
+*.tsbuildinfo
