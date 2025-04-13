@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@source "../node_modules/@melony/next/node_modules/@melony/ui/dist/**/*.{js,ts,jsx,tsx,mdx}";
+@source "../node_modules/@melony/node_modules/@melony/ui/dist/**/*.{js,ts,jsx,tsx,mdx}";
 
 @custom-variant dark (&:is(.dark *));
 

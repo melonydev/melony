@@ -94,3 +94,37 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Turborepo](https://turbo.build/) for the amazing monorepo tooling
 - [Next.js](https://nextjs.org/) for the React framework
 - [PNPM](https://pnpm.io/) for efficient package management
+
+## 📦 NPM Package
+
+### Installation
+
+```bash
+npm install melony
+# or
+yarn add melony
+# or
+pnpm add melony
+```
+
+### Usage
+
+```typescript
+import { Melony } from 'melony';
+
+// Initialize Melony
+const melony = new Melony();
+
+// Use Melony features
+melony.doSomething();
+```
+
+### API Documentation
+
+For detailed API documentation, please visit our [documentation website](https://melony.dev/docs).
+
+### Package Information
+
+- **Version**: [![npm version](https://badge.fury.io/js/melony.svg)](https://badge.fury.io/js/melony)
+- **Downloads**: [![npm downloads](https://img.shields.io/npm/dm/melony.svg)](https://npm-stat.com/charts.html?package=melony)
+- **Bundle Size**: [![bundle size](https://img.shields.io/bundlephobia/min/melony)](https://bundlephobia.com/package/melony)

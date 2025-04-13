@@ -18,7 +18,6 @@
     "tailwind-merge": "^2.2.1",
     "tw-animate-css": "^1.2.5",
     "@melony/ui": "workspace:*",
-    "@melony/next": "workspace:*",
     "melony": "workspace:*"
   },
   "devDependencies": {

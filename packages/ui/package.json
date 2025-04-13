@@ -1,14 +1,20 @@
 {
   "name": "@melony/ui",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.3.2",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint .",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "publish": "npm publish --access public",
+    "version:patch": "npm version patch",
+    "version:minor": "npm version minor",
+    "version:major": "npm version major",
+    "publish:patch": "npm version patch && npm publish --access public",
+    "publish:minor": "npm version minor && npm publish --access public",
+    "publish:major": "npm version major && npm publish --access public"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.4",

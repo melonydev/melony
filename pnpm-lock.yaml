@@ -20,9 +20,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@melony/next':
-        specifier: workspace:*
-        version: link:../../packages/next
       '@melony/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -123,28 +120,6 @@ importers:
       '@melony/ui':
         specifier: workspace:*
         version: link:../ui
-      react:
-        specifier: ^18.0.0
-        version: 18.3.1
-    devDependencies:
-      '@types/react':
-        specifier: ^18.0.0
-        version: 18.3.20
-      tsup:
-        specifier: ^8.0.0
-        version: 8.4.0(jiti@2.4.2)(postcss@8.5.3)(typescript@5.8.2)(yaml@2.7.1)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.8.2
-
-  packages/next:
-    dependencies:
-      '@melony/ui':
-        specifier: workspace:*
-        version: link:../ui
-      melony:
-        specifier: workspace:*
-        version: link:../melony
       react:
         specifier: ^18.0.0
         version: 18.3.1
