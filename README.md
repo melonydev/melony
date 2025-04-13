@@ -1,84 +1,96 @@
-# Turborepo starter
+# Melony - Modern Monorepo Starter Kit 🚀
 
-This Turborepo starter is maintained by the Turborepo core team.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
+[![PNPM](https://img.shields.io/badge/pnpm-9.0.0-blue)](https://pnpm.io/)
 
-## Using this example
+Melony is a powerful, production-ready monorepo starter kit built with Turborepo, Next.js, and TypeScript. It provides a modern development environment with best practices and optimized tooling for building scalable applications.
 
-Run the following command:
+## ✨ Features
 
-```sh
-npx create-turbo@latest
-```
+- 🏗️ **Monorepo Architecture**: Built with Turborepo for efficient package management
+- ⚡ **Next.js**: Modern React framework for building web applications
+- 📦 **Package Management**: Uses PNPM for fast and efficient dependency management
+- 🔍 **TypeScript**: Full TypeScript support for type-safe development
+- 🎨 **UI Components**: Shared component library for consistent design
+- 🛠️ **Development Tools**:
+  - ESLint for code linting
+  - Prettier for code formatting
+  - TypeScript configuration
+  - Remote caching support
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## 📦 Project Structure
 
 ```
-cd my-turborepo
-pnpm build
+melony/
+├── apps/
+│   └── web/          # Next.js web application
+├── packages/
+│   ├── melony/       # Core package
+│   ├── next/         # Next.js configuration
+│   ├── ui/           # Shared UI components
+│   ├── eslint-config/ # ESLint configuration
+│   └── typescript-config/ # TypeScript configuration
 ```
 
-### Develop
+## 🚀 Getting Started
 
-To develop all apps and packages, run the following command:
+### Prerequisites
 
+- Node.js >= 18
+- PNPM >= 9.0.0
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/melony.git
+cd melony
 ```
-cd my-turborepo
+
+2. Install dependencies:
+```bash
+pnpm install
+```
+
+3. Start the development server:
+```bash
 pnpm dev
 ```
 
-### Remote Caching
+## 🛠️ Development
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- **Build**: `pnpm build`
+- **Development**: `pnpm dev`
+- **Lint**: `pnpm lint`
+- **Format**: `pnpm format`
+- **Type Checking**: `pnpm check-types`
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🔄 Remote Caching
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+Melony supports Turborepo's remote caching for faster builds. To enable:
 
-```
-cd my-turborepo
-npx turbo login
-```
+1. Create a Vercel account
+2. Run `npx turbo login`
+3. Link your repository: `npx turbo link`
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 📚 Documentation
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+- [Turborepo Documentation](https://turbo.build/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [PNPM Documentation](https://pnpm.io/)
 
-```
-npx turbo link
-```
+## 🤝 Contributing
 
-## Useful Links
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Learn more about the power of Turborepo:
+## 📝 License
 
-- [Tasks](https://turbo.build/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/docs/reference/command-line-reference)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Turborepo](https://turbo.build/) for the amazing monorepo tooling
+- [Next.js](https://nextjs.org/) for the React framework
+- [PNPM](https://pnpm.io/) for efficient package management
